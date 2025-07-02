@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - Bibliothèque</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Inscription</h2>
+        <form method="post" action="/registerUser">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" required>
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" required>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required>
+            <label for="type">Type d'utilisateur</label>
+            <select id="type" name="type" required onchange="toggleClientFields()">
+                <option value="CLIENT">Client</option>
+                <option value="BIBLIOTHECAIRE">Bibliothécaire</option>
+            </select>
+            <div id="clientFields">
+                <label for="dateNaissance">Date de naissance</label>
+                <input type="date" id="dateNaissance" name="dateNaissance">
+                <label for="idProfil">Profil adhérent</label>
+                <select id="idProfil" name="idProfil">
+                    <!-- Les options seront injectées par Thymeleaf -->
+                    <th:block th:each="profil : ${profils}">
+                        <option th:value="${profil.id}" th:text="${profil.nomProfil}"></option>
+                    </th:block>
+                </select>
+            </div>
+            <button type="submit">S'inscrire</button>
+        </form>
+        <a class="login-link" href="/pages/auth/login.html">Déjà un compte ? Se connecter</a>
+    </div>
+    <script>
+        function toggleClientFields() {
+            var type = document.getElementById('type').value;
+            var clientFields = document.getElementById('clientFields');
+            clientFields.style.display = (type === 'CLIENT') ? 'block' : 'none';
+        }
+        window.onload = toggleClientFields;
+    </script>
+</body>
+
+</html>

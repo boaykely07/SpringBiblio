@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestion Bibliothèque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div class="content">
+        <!-- Main Content -->
+        <div class="ml-5 flex-1">
+            <div th:replace="fragments/sidebar :: header"></div>
+            <!-- Header -->
+
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div
+                        class="bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-custom-dark font-medium">Total Livres</p>
+                                <p class="text-2xl font-bold text-custom-darker">2,847</p>
+                            </div>
+                            <div class="bg-custom-light p-3 rounded-full">
+                                <svg class="w-6 h-6 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-medium hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-custom-dark font-medium">Membres Actifs</p>
+                                <p class="text-2xl font-bold text-custom-darker">1,234</p>
+                            </div>
+                            <div class="bg-custom-light p-3 rounded-full">
+                                <svg class="w-6 h-6 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM9 6a3 3 0 11-6 0 3 3 0 016 0zM7 14a5 5 0 00-5 5v1h10v-1a5 5 0 00-5-5z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-custom-dark font-medium">Emprunts Actifs</p>
+                                <p class="text-2xl font-bold text-custom-darker">89</p>
+                            </div>
+                            <div class="bg-custom-light p-3 rounded-full">
+                                <svg class="w-6 h-6 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-custom-dark font-medium">Retards</p>
+                                <p class="text-2xl font-bold text-red-600">12</p>
+                            </div>
+                            <div class="bg-red-50 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+
+
+            </main>
+        </div>
+    </div>
+
+</body>
+<script>
+    // Set current date
+    const now = new Date();
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.hover\\:shadow-lg');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Simulate real-time updates
+    setInterval(() => {
+        const notifications = document.querySelector('.animate-pulse');
+        if (notifications) {
+            notifications.style.opacity = notifications.style.opacity === '0' ? '1' : '0';
+        }
+    }, 2000);
+
+    // Add click animations to buttons
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('click', function (e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+
+<style>
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+    }
+
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* Responsive sidebar */
+    @media (max-width: 1024px) {
+        #sidebar {
+            transform: translateX(-100%);
+        }
+
+        .ml-64 {
+            margin-left: 0;
+        }
+    }
+
+    /* Smooth transitions */
+    * {
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #E7EFC7;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #AEC8A4;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #8A784E;
+    }
+</style>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    'custom-light': '#E7EFC7',
+                    'custom-medium': '#AEC8A4',
+                    'custom-dark': '#8A784E',
+                    'custom-darker': '#3B3B1A',
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.5s ease-in-out',
+                    'slide-up': 'slideUp 0.3s ease-out',
+                    'pulse-subtle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                },
+                keyframes: {
+                    fadeIn: {
+                        '0%': { opacity: '0' },
+                        '100%': { opacity: '1' }
+                    },
+                    slideUp: {
+                        '0%': { transform: 'translateY(10px)', opacity: '0' },
+                        '100%': { transform: 'translateY(0)', opacity: '1' }
+                    }
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .content {
+        margin-left: 220px;
+        padding: 20px;
+    }
+</style>
+
+</html>
