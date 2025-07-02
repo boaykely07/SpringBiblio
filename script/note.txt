@@ -1,0 +1,122 @@
+Note direct:
+livre/pret(surplace sa a domicile)/adherent(Etudiant,Anonyme,Professionel,Professeur)
+Tsy ny livre no indramina fa exemplaire
+Misy boky tsy afaka oentina mody afa tsy mpampianatra ohatra
+Misy dureer findramana boky na à domicile na surplace
+Penalités: tsy azo mindrana boky satria tsy nahavoatitra
+Inscription:Misy abonement , misy durée abonnement.
+Misy cota findramana boky ohatra oe 5 ihany mpianatra .parametrable ireo
+Misy ny atao hoe reservation , ty boky ty a reserveko amizao katramizao
+prolongement pret, parametrable par type d'emprunteur
+gestion jour férié sy weekend raha alahady ohatra dia zoma no aterina na apres dia alatsinainy
+Dashboard
+
+# 📚 Application de gestion de bibliothèque
+
+## ✅ Règles de gestion (ou règles métier)
+
+### 🔹 Gestion des livres et des exemplaires
+
+* Un livre peut avoir plusieurs exemplaires.
+* Ce sont les exemplaires qu’on emprunte, pas les livres eux-mêmes.
+* Chaque exemplaire a un état (disponible, emprunté, en réparation, perdu…).
+* Certains livres ou exemplaires sont consultables uniquement sur place.
+* Certains livres sont exclus de l’emprunt à domicile selon le type d’emprunteur.
+* L’autorisation d’emprunt dépend du type d’emprunteur (étudiant, professeur, chercheur…).
+* La durée de prêt dépend du type d’emprunt (sur place ou à domicile).
+
+### 🔹 Gestion des emprunteurs et abonnements
+
+* L’inscription à la bibliothèque se fait avec un abonnement.
+* L’abonnement est lié à un type (mensuel, annuel, etc.) et a un tarif.
+* Chaque emprunteur est lié à un profil (étudiant, enseignant, externe...).
+* Chaque type d’emprunteur a un quota d’emprunts simultanés.
+
+### 🔹 Prêt, retour et réservation
+
+* Un exemplaire emprunté doit être retourné avant la date limite.
+* Un retour en retard génère une pénalité.
+* Un emprunteur avec pénalités actives ne peut pas emprunter.
+* Un exemplaire ne peut être prêté si son statut n’est pas “disponible”.
+* Un emprunteur ne peut pas emprunter un exemplaire d’un livre interdit à son type.
+* Un exemplaire peut être réservé pour une période donnée (de date à date).
+* Un prêt peut être prolongé, selon les droits du type d’emprunteur.
+* La prolongation peut être interdite si le livre est réservé ou si l'utilisateur a atteint sa limite.
+* Les jours fériés et weekends sont pris en compte dans le calcul de la durée de prêt.
+
+### 🔹 Gestion des pénalités
+
+* Une pénalité est calculée selon la formule : `(jours de retard) x (montant par jour)`.
+* Le montant peut varier selon le type d’emprunteur ou de prêt.
+* Les pénalités doivent pouvoir être réglées ou expirer avec le temps.
+
+---
+
+## 💡 Fonctionnalités principales de l’application
+
+### 👤 Gestion des utilisateurs (emprunteurs)
+
+* Inscription avec choix d’abonnement
+* Gestion des profils (étudiant, professeur, externe…)
+* Consultation du quota, de l’historique, des pénalités
+
+### 📚 Gestion des livres et exemplaires
+
+* Ajout / modification / suppression de livres
+* Gestion des exemplaires par livre (ajout, état, disponibilité)
+* Classification par catégorie, auteur, éditeur, etc.
+
+### 📖 Emprunt, retour et réservation
+
+* Emprunt sur place ou à domicile (si autorisé)
+* Saisie des dates d’emprunt et de retour
+* Calcul automatique de la date limite et des pénalités
+* Réservation d’exemplaires sur une période définie
+* Prolongation des prêts (selon les droits)
+* Blocage de prolongation si exemplaire réservé
+* Gestion des jours fériés et weekends dans les calculs de dates
+
+### ⏳ Gestion des pénalités
+
+* Calcul des retards
+* Blocage d’emprunt si pénalité active
+* Système de paiement ou d’expiration automatique
+
+### 🔔 Notifications / Alertes
+
+* Rappel avant la date de retour
+* Notification de pénalité
+* Message d’erreur si quota dépassé ou livre interdit
+* Alerte en cas de réservation proche
+
+### 📅 Abonnements
+
+* Création d’abonnements personnalisés (durée, prix, type d’utilisateur)
+* Gestion des renouvellements
+* Expiration automatique de l’abonnement
+
+### 📊 Tableau de bord et statistiques
+
+* Nombre d’exemplaires disponibles / empruntés
+* Top livres empruntés
+* Emprunteurs actifs / inactifs
+* Livres les plus pénalisés
+* Suivi des réservations et prolongations
+
+---
+
+## 🔗 Exemple réel : PMB (PhpMyBibli)
+
+PMB est une application open source utilisée dans les bibliothèques publiques ou universitaires. Elle inclut :
+
+* Gestion fine des exemplaires
+* Règles d’emprunt personnalisables
+* Gestion des abonnements et des lecteurs
+* Suivi des prêts, retours et pénalités
+* Réservations et prolongations
+
+Site : [https://www.sigb.net](https://www.sigb.net)
+
+---
+
+> Ce document résume les règles essentielles et les fonctionnalités de base d’un projet réel de gestion de bibliothèque, adaptable selon les spécificités du contexte.
