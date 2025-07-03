@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvel abonnement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Nouvel abonnement</h2>
+                <form th:action="@{/abonnements}" th:object="${abonnement}" method="post"
+                    class="space-y-4 bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark max-w-xl">
+                    <div>
+                        <label for="adherent" class="block font-medium mb-1 text-custom-dark">Adhérent</label>
+                        <select id="adherent" name="adherent.id" class="form-select w-full border rounded p-2" required>
+                            <option th:each="ad : ${adherents}" th:value="${ad.id}" th:text="|${ad.nom} ${ad.prenom}|">
+                                Adhérent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="dateDebut" class="block font-medium mb-1 text-custom-dark">Date de début</label>
+                        <input type="date" id="dateDebut" name="dateDebut" class="form-input w-full border rounded p-2"
+                            required th:value="${abonnement.dateDebut}">
+                    </div>
+                    <div>
+                        <label for="dateFin" class="block font-medium mb-1 text-custom-dark">Date de fin</label>
+                        <input type="date" id="dateFin" name="dateFin" class="form-input w-full border rounded p-2"
+                            required th:value="${abonnement.dateFin}">
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4">
+                        <button type="submit"
+                            class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Valider</button>
+                        <a href="/abonnements"
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Annuler</a>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>
