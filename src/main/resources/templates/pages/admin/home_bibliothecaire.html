@@ -5,21 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Gestion Bibliothèque</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-
-
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 
 <body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
-
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
     <div class="content">
         <!-- Main Content -->
         <div class="ml-5 flex-1">
-            <div th:replace="fragments/sidebar :: header"></div>
+            <div th:replace="~{fragments/sidebar :: header}"></div>
             <!-- Header -->
-
-
             <!-- Dashboard Content -->
             <main class="p-6">
                 <!-- Stats Cards -->
@@ -99,157 +96,9 @@
             </main>
         </div>
     </div>
-
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
 </body>
-<script>
-    // Set current date
-    const now = new Date();
-    const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    };
-    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
 
-    // Mobile menu toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
-
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('-translate-x-full');
-    });
-
-    // Add hover effects to cards
-    const cards = document.querySelectorAll('.hover\\:shadow-lg');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-2px)';
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-        });
-    });
-
-    // Simulate real-time updates
-    setInterval(() => {
-        const notifications = document.querySelector('.animate-pulse');
-        if (notifications) {
-            notifications.style.opacity = notifications.style.opacity === '0' ? '1' : '0';
-        }
-    }, 2000);
-
-    // Add click animations to buttons
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('click', function (e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-
-            this.appendChild(ripple);
-
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-</script>
-
-<style>
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.6);
-        transform: scale(0);
-        animation: ripple 0.6s linear;
-        pointer-events: none;
-    }
-
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-
-    /* Responsive sidebar */
-    @media (max-width: 1024px) {
-        #sidebar {
-            transform: translateX(-100%);
-        }
-
-        .ml-64 {
-            margin-left: 0;
-        }
-    }
-
-    /* Smooth transitions */
-    * {
-        transition: all 0.2s ease-in-out;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #E7EFC7;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #AEC8A4;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #8A784E;
-    }
-</style>
-<script>
-    tailwind.config = {
-        darkMode: 'class',
-        theme: {
-            extend: {
-                colors: {
-                    'custom-light': '#E7EFC7',
-                    'custom-medium': '#AEC8A4',
-                    'custom-dark': '#8A784E',
-                    'custom-darker': '#3B3B1A',
-                },
-                animation: {
-                    'fade-in': 'fadeIn 0.5s ease-in-out',
-                    'slide-up': 'slideUp 0.3s ease-out',
-                    'pulse-subtle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                },
-                keyframes: {
-                    fadeIn: {
-                        '0%': { opacity: '0' },
-                        '100%': { opacity: '1' }
-                    },
-                    slideUp: {
-                        '0%': { transform: 'translateY(10px)', opacity: '0' },
-                        '100%': { transform: 'translateY(0)', opacity: '1' }
-                    }
-                }
-            }
-        }
-    }
-</script>
-<style>
-    .content {
-        margin-left: 220px;
-        padding: 20px;
-    }
-</style>
 
 </html>
