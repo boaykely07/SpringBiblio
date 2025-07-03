@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des pénalités</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Liste des pénalités</h2>
+                <a href="/penalites/new"
+                    class="mb-4 inline-block bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Nouvelle
+                    pénalité</a>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead>
+                            <tr class="bg-custom-medium text-custom-darker">
+                                <th class="py-2 px-4">ID</th>
+                                <th class="py-2 px-4">Adhérent</th>
+                                <th class="py-2 px-4">Emprunt</th>
+                                <th class="py-2 px-4">Date début</th>
+                                <th class="py-2 px-4">Jours</th>
+                                <th class="py-2 px-4">Raison</th>
+                                <th class="py-2 px-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="penalite : ${penalites}" class="border-b hover:bg-custom-light">
+                                <td class="py-2 px-4" th:text="${penalite.id}"></td>
+                                <td class="py-2 px-4" th:text="|${penalite.adherent.nom} ${penalite.adherent.prenom}|">
+                                </td>
+                                <td class="py-2 px-4" th:text="${penalite.emprunt.id}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.dateDebut}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.jour}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.raison}"></td>
+                                <td class="py-2 px-4">
+                                    <a th:href="@{'/penalites/delete/' + ${penalite.id}}"
+                                        class="text-red-600 hover:underline">Supprimer</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(penalites)}">
+                                <td colspan="7" class="text-center py-4 text-gray-500">Aucune pénalité trouvée.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>
