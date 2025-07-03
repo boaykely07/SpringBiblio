@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle pénalité</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Nouvelle pénalité</h2>
+                <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+                    th:text="${error}"></div>
+                <form th:action="@{/penalites}" th:object="${penalite}" method="post"
+                    class="space-y-4 bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark max-w-xl">
+                    <div>
+                        <label for="adherent" class="block font-medium mb-1 text-custom-dark">Adhérent</label>
+                        <select id="adherent" name="adherent.id" class="form-select w-full border rounded p-2" required>
+                            <option th:each="ad : ${adherents}" th:value="${ad.id}" th:text="|${ad.nom} ${ad.prenom}|">
+                                Adhérent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="emprunt" class="block font-medium mb-1 text-custom-dark">Emprunt</label>
+                        <select id="emprunt" name="emprunt.id" class="form-select w-full border rounded p-2" required>
+                            <option th:each="emp : ${emprunts}" th:value="${emp.id}" th:text="|Emprunt #${emp.id}|">
+                                Emprunt</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="dateDebut" class="block font-medium mb-1 text-custom-dark">Date de début</label>
+                        <input type="date" id="dateDebut" name="dateDebut" class="form-input w-full border rounded p-2"
+                            required th:value="${penalite.dateDebut}">
+                    </div>
+                    <div>
+                        <label for="jour" class="block font-medium mb-1 text-custom-dark">Nombre de jours</label>
+                        <input type="number" id="jour" name="jour" class="form-input w-full border rounded p-2" required
+                            min="1" th:value="${penalite.jour}">
+                    </div>
+                    <div>
+                        <label for="raison" class="block font-medium mb-1 text-custom-dark">Raison</label>
+                        <input type="text" id="raison" name="raison" class="form-input w-full border rounded p-2"
+                            th:value="${penalite.raison}">
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4">
+                        <button type="submit"
+                            class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Valider</button>
+                        <a href="/penalites"
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Annuler</a>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>
