@@ -15,7 +15,7 @@
         <div class="ml-5 flex-1">
             <div th:replace="~{fragments/sidebar :: header}"></div>
             <main class="p-6">
-                <h2 class="text-2xl font-bold mb-6">Nouvelle pénalité : </h2>
+                <h2 class="text-2xl font-bold mb-6">Nouvelle pénalité</h2>
                 <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
                     th:text="${error}"></div>
                 <form th:action="@{/penalites}" th:object="${penalite}" method="post"
@@ -39,7 +39,6 @@
                         <input type="date" id="dateDebut" name="dateDebut" class="form-input w-full border rounded p-2"
                             required th:value="${penalite.dateDebut}">
                     </div>
-
                     <div>
                         <label for="jour" class="block font-medium mb-1 text-custom-dark">Nombre de jours</label>
                         <input type="number" id="jour" name="jour" class="form-input w-full border rounded p-2" required
@@ -54,7 +53,7 @@
                         <button type="submit"
                             class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Valider</button>
                         <a href="/penalites"
-                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Retour</a>
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Annuler</a>
                     </div>
                 </form>
             </main>
