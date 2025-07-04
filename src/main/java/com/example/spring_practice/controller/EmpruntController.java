@@ -61,6 +61,12 @@ public class EmpruntController {
     @PostMapping
     public String saveEmprunt(@ModelAttribute EmpruntEntity emprunt, Model model) {
         try {
+            // Recharge l'exemplaire complet depuis la base
+            if (emprunt.getExemplaire() != null && emprunt.getExemplaire().getId() != null) {
+                ExemplaireEntity ex = exemplaireRepository.findById(emprunt.getExemplaire().getId())
+                    .orElse(null);
+                emprunt.setExemplaire(ex);
+            }
             empruntService.save(emprunt);
             return "redirect:/emprunts";
         } catch (IllegalStateException e) {

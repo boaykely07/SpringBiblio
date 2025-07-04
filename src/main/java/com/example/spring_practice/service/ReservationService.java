@@ -12,6 +12,8 @@ import com.example.spring_practice.repository.ExemplaireRepository;
 import com.example.spring_practice.model.entities.ExemplaireEntity;
 import com.example.spring_practice.service.EmpruntService;
 import com.example.spring_practice.model.entities.EmpruntEntity;
+import com.example.spring_practice.repository.AbonnementRepository;
+import com.example.spring_practice.model.entities.AbonnementEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,9 @@ public class ReservationService {
     @Autowired
     private EmpruntService empruntService;
 
+    @Autowired
+    private AbonnementRepository abonnementRepository;
+
     public List<ReservationEntity> findAll() {
         return reservationRepository.findAll();
     }
@@ -58,6 +63,16 @@ public class ReservationService {
             if ((dateResa.isEqual(debut) || dateResa.isAfter(debut)) && dateResa.isBefore(fin.plusDays(1))) {
                 throw new IllegalStateException("L'adhérent a une pénalité couvrant la date de réservation et ne peut pas réserver.");
             }
+        }
+        // Vérification de l'abonnement actif à la date de réservation
+        List<AbonnementEntity> abonnements = abonnementRepository.findByAdherentId(adherentId);
+        java.time.LocalDate dateResa = reservation.getDateAReserver();
+        boolean actif = abonnements.stream().anyMatch(ab ->
+            (dateResa.isEqual(ab.getDateDebut()) || dateResa.isAfter(ab.getDateDebut())) &&
+            (dateResa.isEqual(ab.getDateFin()) || dateResa.isBefore(ab.getDateFin()))
+        );
+        if (!actif) {
+            throw new IllegalStateException("L'adhérent n'a pas d'abonnement actif à la date de la réservation.");
         }
         // Vérification de la disponibilité d'exemplaires pour la date de réservation
         Long livreId = reservation.getLivre().getId();
