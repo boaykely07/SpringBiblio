@@ -26,10 +26,10 @@ INSERT INTO Categories (nom) VALUES
   ('Jeunesse');
 
 -- Insertion de livres
-INSERT INTO Livres (titre, isbn, annee_publication, resume, id_editeur) VALUES
-  ('Les Misérables', '9782070409189', 1862, 'Roman historique de Victor Hugo.', 1),
-  ('Germinal', '9782070413117', 1885, 'Roman d Emile Zola sur le monde ouvrier.', 2),
-  ('Harry Potter à l ecole des sorciers', '9782070643026', 1997, 'Premier tome de la saga Harry Potter.', 3);
+INSERT INTO Livres (titre, isbn, annee_publication, resume, id_editeur, id_auteur) VALUES
+  ('Les Misérables', '9782070409189', 1862, 'Roman historique de Victor Hugo.', 1, 1),
+  ('Germinal', '9782070413117', 1885, 'Roman d Emile Zola sur le monde ouvrier.', 2, 2),
+  ('Harry Potter à l ecole des sorciers', '9782070643026', 1997, 'Premier tome de la saga Harry Potter.', 3, 3);
 
 -- Insertion d'exemplaires
 INSERT INTO Exemplaires (id_livre, quantite) VALUES
@@ -43,13 +43,6 @@ INSERT INTO Droits_Emprunt_Specifiques (id_livre, id_profil, age, emprunt_surpla
   (2, 2, 16, TRUE, TRUE),
   (3, 3, 10, TRUE, FALSE);
 
--- Insertion de liaisons Livres_Auteurs
-INSERT INTO Livres_Auteurs (id_livre, id_auteur) VALUES
-  (1, 1), -- Les Misérables, Victor Hugo
-  (2, 2), -- Germinal, Émile Zola
-  (3, 3), -- Harry Potter, J.K. Rowling
-  (3, 4); -- Harry Potter, Albert Camus (exemple multi-auteur)
-
 -- Insertion de liaisons Livres_Categories
 INSERT INTO Livres_Categories (id_livre, id_categorie) VALUES
   (1, 1), -- Les Misérables, Roman
@@ -57,3 +50,19 @@ INSERT INTO Livres_Categories (id_livre, id_categorie) VALUES
   (2, 2), -- Germinal, Policier (exemple multi-catégorie)
   (3, 4), -- Harry Potter, Jeunesse
   (3, 3); -- Harry Potter, Science-Fiction
+
+-- Données de test pour Type_emprunts
+INSERT INTO Type_emprunts (nom_type) VALUES ('Sur place');
+INSERT INTO Type_emprunts (nom_type) VALUES ('À domicile');
+
+-- Insertion de statuts d'emprunt
+INSERT INTO Statuts_Emprunt (code_statut) VALUES ('En cours');
+INSERT INTO Statuts_Emprunt (code_statut) VALUES ('Rendu');
+INSERT INTO Statuts_Emprunt (code_statut) VALUES ('Retard');
+INSERT INTO Statuts_Emprunt (code_statut) VALUES ('Perdu');
+
+-- Insertion de statuts de réservation
+INSERT INTO Statuts_Reservation (code_statut) VALUES ('En attente');
+INSERT INTO Statuts_Reservation (code_statut) VALUES ('Validée');
+INSERT INTO Statuts_Reservation (code_statut) VALUES ('Annulée');
+INSERT INTO Statuts_Reservation (code_statut) VALUES ('Expirée');
