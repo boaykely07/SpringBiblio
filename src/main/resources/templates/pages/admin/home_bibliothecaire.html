@@ -26,7 +26,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-custom-dark font-medium">Total Livres</p>
-                                <p class="text-2xl font-bold text-custom-darker">2,847</p>
+                                <p class="text-2xl font-bold text-custom-darker" th:text="${totalLivres}">0</p>
                             </div>
                             <div class="bg-custom-light p-3 rounded-full">
                                 <svg class="w-6 h-6 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
@@ -43,7 +43,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-custom-dark font-medium">Membres Actifs</p>
-                                <p class="text-2xl font-bold text-custom-darker">1,234</p>
+                                <p class="text-2xl font-bold text-custom-darker" th:text="${totalAdherents}">0</p>
                             </div>
                             <div class="bg-custom-light p-3 rounded-full">
                                 <svg class="w-6 h-6 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
@@ -60,7 +60,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-custom-dark font-medium">Emprunts Actifs</p>
-                                <p class="text-2xl font-bold text-custom-darker">89</p>
+                                <p class="text-2xl font-bold text-custom-darker" th:text="${empruntsActifs}">0</p>
                             </div>
                             <div class="bg-custom-light p-3 rounded-full">
                                 <svg class="w-6 h-6 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
@@ -77,7 +77,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-custom-dark font-medium">Retards</p>
-                                <p class="text-2xl font-bold text-red-600">12</p>
+                                <p class="text-2xl font-bold text-red-600" th:text="${retards}">0</p>
                             </div>
                             <div class="bg-red-50 p-3 rounded-full">
                                 <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
