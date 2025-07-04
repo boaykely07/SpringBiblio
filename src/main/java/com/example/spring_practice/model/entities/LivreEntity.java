@@ -26,6 +26,10 @@ public class LivreEntity {
     @JoinColumn(name = "id_editeur")
     private EditeurEntity editeur;
 
+    @ManyToOne
+    @JoinColumn(name = "id_auteur")
+    private AuteurEntity auteur;
+
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -39,4 +43,6 @@ public class LivreEntity {
     public void setResume(String resume) { this.resume = resume; }
     public EditeurEntity getEditeur() { return editeur; }
     public void setEditeur(EditeurEntity editeur) { this.editeur = editeur; }
+    public AuteurEntity getAuteur() { return auteur; }
+    public void setAuteur(AuteurEntity auteur) { this.auteur = auteur; }
 } 
