@@ -73,12 +73,23 @@ public class EmpruntService {
         int disponible = quantiteTotale;
         for (EmpruntEntity e : empruntsExemplaire) {
             String statut = getLastStatutForEmprunt(e.getId());
+            // Vérification de chevauchement de période pour "En cours" ou "Retard"
+            if ("En cours".equalsIgnoreCase(statut) || "Retard".equalsIgnoreCase(statut)) {
+                LocalDateTime debutExist = e.getDateEmprunt();
+                LocalDateTime finExist = e.getDateRetourPrevue();
+                LocalDateTime debutNouveau = emprunt.getDateEmprunt();
+                LocalDateTime finNouveau = emprunt.getDateRetourPrevue();
+                boolean chevauche = !finNouveau.isBefore(debutExist) && !debutNouveau.isAfter(finExist);
+                if (chevauche) {
+                    throw new IllegalStateException("Un autre emprunt pour cet exemplaire chevauche la période demandée (statut 'En cours' ou 'Retard').");
+                }
+            }
             if ("En cours".equalsIgnoreCase(statut)) {
                 disponible -= 1;
             } else if ("Rendu".equalsIgnoreCase(statut)) {
                 disponible += 1;
             }
-            // Statut 'Retard' : on ne fait rien
+            // Statut 'Retard' : on ne fait rien pour la quantité
         }
         if (disponible <= 0) {
             throw new IllegalStateException("Aucun exemplaire disponible pour cet emprunt.");

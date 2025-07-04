@@ -20,15 +20,11 @@ public class ReservationEntity {
     @JoinColumn(name = "id_adherent", nullable = false)
     private AdherentEntity adherent;
 
-    @ManyToOne
-    @JoinColumn(name = "id_statut", nullable = false)
-    private StatutReservationEntity statut;
-
     @Column(name = "date_demande", nullable = false)
     private LocalDateTime dateDemande;
 
-    @Column(name = "date_expiration", nullable = false)
-    private LocalDate dateExpiration;
+    @Column(name = "date_a_reserver", nullable = false)
+    private LocalDate dateAReserver;
 
     // Getters et setters
     public Long getId() { return id; }
@@ -37,10 +33,8 @@ public class ReservationEntity {
     public void setLivre(LivreEntity livre) { this.livre = livre; }
     public AdherentEntity getAdherent() { return adherent; }
     public void setAdherent(AdherentEntity adherent) { this.adherent = adherent; }
-    public StatutReservationEntity getStatut() { return statut; }
-    public void setStatut(StatutReservationEntity statut) { this.statut = statut; }
     public LocalDateTime getDateDemande() { return dateDemande; }
     public void setDateDemande(LocalDateTime dateDemande) { this.dateDemande = dateDemande; }
-    public LocalDate getDateExpiration() { return dateExpiration; }
-    public void setDateExpiration(LocalDate dateExpiration) { this.dateExpiration = dateExpiration; }
+    public LocalDate getDateAReserver() { return dateAReserver; }
+    public void setDateAReserver(LocalDate dateAReserver) { this.dateAReserver = dateAReserver; }
 } 

@@ -72,7 +72,8 @@ public class AuthController {
             return "redirect:/home";
         } catch (Exception e) {
             System.out.println("Erreur lors de l'authentification : " + e.getMessage());
-            throw e; // Pour voir la stacktrace complète dans la console
+            model.addAttribute("error", "Email ou mot de passe incorrect.");
+            return "pages/auth/login";
         }
     }
 
