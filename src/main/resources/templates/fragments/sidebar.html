@@ -15,8 +15,9 @@
         </div>
 
         <nav class="mt-8 px-4 space-y-2">
-            <a href="#"
-                class="flex items-center px-4 py-3 text-custom-darker bg-custom-light border-r-4 border-custom-dark rounded-l-lg transition-all duration-200 hover:bg-custom-medium group">
+            <a href="/home"
+                th:classappend="${activePage} == 'dashboard' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-medium hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path
                         d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z">
@@ -25,8 +26,9 @@
                 Dashboard
             </a>
 
-            <a href="#"
-                class="flex items-center px-4 py-3 text-gray-600 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+            <a href="/livres"
+                th:classappend="${activePage} == 'livres' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path
                         d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z">
@@ -36,7 +38,8 @@
             </a>
 
             <a href="#"
-                class="flex items-center px-4 py-3 text-gray-600 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                th:classappend="${activePage} == 'membres' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path
                         d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM9 6a3 3 0 11-6 0 3 3 0 016 0zM7 14a5 5 0 00-5 5v1h10v-1a5 5 0 00-5-5zM2 10a3 3 0 116 0v5a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 112 0v1a3 3 0 01-3 3h-1a3 3 0 01-3-3v-5z">
@@ -46,7 +49,8 @@
             </a>
 
             <a href="/emprunts"
-                class="flex items-center px-4 py-3 text-gray-600 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                th:classappend="${activePage} == 'emprunts' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 01-1 1H8a1 1 0 110-2h4a1 1 0 011 1zm-1 4a1 1 0 100-2H8a1 1 0 100 2h4z"
@@ -56,7 +60,8 @@
             </a>
 
             <a href="/abonnements"
-                class="flex items-center px-4 py-3 text-gray-600 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                th:classappend="${activePage} == 'abonnements' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M4 3a1 1 0 011-1h10a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V3zm2 2a1 1 0 100 2h8a1 1 0 100-2H6zm0 4a1 1 0 100 2h8a1 1 0 100-2H6zm0 4a1 1 0 100 2h8a1 1 0 100-2H6z"
@@ -66,7 +71,8 @@
             </a>
 
             <a href="/penalites"
-                class="flex items-center px-4 py-3 text-gray-600 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                th:classappend="${activePage} == 'penalites' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M9 2a7 7 0 100 14A7 7 0 009 2zm0 2a5 5 0 110 10A5 5 0 019 4zm1 2a1 1 0 10-2 0 1 1 0 002 0zm-1 2a1 1 0 00-1 1v2a1 1 0 002 0V7a1 1 0 00-1-1z"
@@ -75,8 +81,30 @@
                 Pénalités
             </a>
 
+            <a href="/prolongements"
+                th:classappend="${activePage} == 'prolongements' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M12 8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm-2 8a6 6 0 100-12 6 6 0 000 12zm0-14a8 8 0 110 16 8 8 0 010-16z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Prolongements
+            </a>
+            <a href="/reservations"
+                th:classappend="${activePage} == 'reservations' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v10H5V5zm2 2a1 1 0 100 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Réservations
+            </a>
+
             <a href="#"
-                class="flex items-center px-4 py-3 text-gray-600 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                th:classappend="${activePage} == 'rapports' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"

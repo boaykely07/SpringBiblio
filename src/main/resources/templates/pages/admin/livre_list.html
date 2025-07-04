@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste livre</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Liste des livres</h2>
+                <a href="/livres/new"
+                    class="mb-4 inline-block bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Ajouter
+                    un livre</a>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead>
+                            <tr class="bg-custom-medium text-custom-darker">
+                                <th class="py-2 px-4">ID</th>
+                                <th class="py-2 px-4">Titre</th>
+                                <th class="py-2 px-4">ISBN</th>
+                                <th class="py-2 px-4">Année</th>
+                                <th class="py-2 px-4">Éditeur</th>
+                                <th class="py-2 px-4">Auteur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="livre : ${livres}" class="border-b hover:bg-custom-light">
+                                <td class="py-2 px-4" th:text="${livre.id}"></td>
+                                <td class="py-2 px-4" th:text="${livre.titre}"></td>
+                                <td class="py-2 px-4" th:text="${livre.isbn}"></td>
+                                <td class="py-2 px-4" th:text="${livre.anneePublication}"></td>
+                                <td class="py-2 px-4" th:text="${livre.editeur != null ? livre.editeur.nom : ''}"></td>
+                                <td class="py-2 px-4"
+                                    th:text="${livre.auteur != null ? livre.auteur.nom + ' ' + livre.auteur.prenom : ''}">
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(livres)}">
+                                <td colspan="6" class="text-center py-4 text-gray-500">Aucun livre trouvé.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>

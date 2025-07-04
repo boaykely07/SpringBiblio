@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réserver un livre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar_client :: sidebar_client}"></div>
+        <div class="flex-1">
+            <div th:replace="~{fragments/sidebar_client :: header_client}"></div>
+            <main class="p-6 max-w-xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Réserver le livre</h2>
+                <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+                    th:text="${error}"></div>
+                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                    <h3 class="text-xl font-semibold text-custom-dark mb-2" th:text="${livre.titre}">Titre du livre</h3>
+                    <p class="mb-1"><span class="font-medium">ISBN :</span> <span th:text="${livre.isbn}"></span></p>
+                    <p class="mb-1"><span class="font-medium">Année :</span> <span
+                            th:text="${livre.anneePublication}"></span></p>
+                    <p class="mb-1"><span class="font-medium">Éditeur :</span> <span
+                            th:text="${livre.editeur != null ? livre.editeur.nom : ''}"></span></p>
+                    <p class="mb-1"><span class="font-medium">Résumé :</span> <span th:text="${livre.resume}"></span>
+                    </p>
+                </div>
+                <form th:action="@{/reservations/new}" method="post" class="bg-white rounded-xl shadow-md p-6">
+                    <input type="hidden" name="livreId" th:value="${livre.id}">
+                    <div class="mb-4">
+                        <label for="dateAReserver" class="block font-medium mb-2 text-custom-dark">Date à
+                            réserver</label>
+                        <input type="date" id="dateAReserver" name="dateAReserver"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-custom-dark focus:border-transparent"
+                            required min="2024-01-01">
+                        <p class="text-sm text-gray-600 mt-1">Sélectionnez la date à laquelle vous souhaitez réserver ce
+                            livre</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <button type="submit"
+                            class="bg-custom-dark text-white px-6 py-2 rounded hover:bg-custom-darker transition">Confirmer
+                            la réservation</button>
+                        <a th:href="@{/livres}" class="mt-4 text-gray-500 hover:underline">Annuler</a>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>

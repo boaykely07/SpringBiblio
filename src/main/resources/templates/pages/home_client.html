@@ -1,14 +1,37 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>Accueil Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Client - Bibliothèque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 
-<body>
-    <h1>Bienvenue, Client !</h1>
-    <a href="/logout">Déconnexion</a>
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar_client :: sidebar_client}"></div>
+        <!-- Main Content -->
+        <div class="flex-1">
+            <!-- Header -->
+            <div th:replace="~{fragments/sidebar_client :: header_client}"></div>
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center justify-center">
+                    <h3 class="text-xl font-semibold text-custom-dark mb-2">Bienvenue sur BiblioTech !</h3>
+                    <p class="text-custom-darker mb-4">Retrouvez ici toutes vos informations de lecteur, suivez vos
+                        emprunts et réservations, et profitez de nos services en ligne.</p>
+                    <a href="/mes-emprunts"
+                        class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Voir mes
+                        emprunts</a>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
 </body>
 
 </html>
