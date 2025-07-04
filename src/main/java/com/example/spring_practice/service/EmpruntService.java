@@ -75,6 +75,10 @@ public class EmpruntService {
                         throw new IllegalStateException("L'âge minimum pour emprunter ce livre est de " + ageMin + " ans pour ce profil.");
                     }
                 }
+                // Vérification du droit d'emprunt à domicile
+                if (!droit.isEmpruntDomicileAutorise()) {
+                    throw new IllegalStateException("Ce profil n'est pas autorisé à emprunter ce livre à domicile.");
+                }
             }
         }
         // Vérification des pénalités en cours
