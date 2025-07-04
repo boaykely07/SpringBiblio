@@ -21,23 +21,31 @@
                 <form th:action="@{/penalites}" th:object="${penalite}" method="post"
                     class="space-y-4 bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark max-w-xl">
                     <div>
-                        <label for="adherent" class="block font-medium mb-1 text-custom-dark">Adhérent</label>
-                        <select id="adherent" name="adherent.id" class="form-select w-full border rounded p-2" required>
+                        <label class="block font-medium mb-1 text-custom-dark">Adhérent</label>
+                        <div th:if="${autoMode}" class="p-2 bg-gray-100 rounded">[[${penalite.adherent.nom}]]
+                            [[${penalite.adherent.prenom}]]</div>
+                        <select th:unless="${autoMode}" id="adherent" name="adherent.id"
+                            class="form-select w-full border rounded p-2" required>
                             <option th:each="ad : ${adherents}" th:value="${ad.id}" th:text="|${ad.nom} ${ad.prenom}|">
                                 Adhérent</option>
                         </select>
                     </div>
                     <div>
-                        <label for="emprunt" class="block font-medium mb-1 text-custom-dark">Emprunt</label>
-                        <select id="emprunt" name="emprunt.id" class="form-select w-full border rounded p-2" required>
+                        <label class="block font-medium mb-1 text-custom-dark">Emprunt</label>
+                        <div th:if="${autoMode}" class="p-2 bg-gray-100 rounded">Emprunt #<span
+                                th:text="${penalite.emprunt.id}"></span></div>
+                        <select th:unless="${autoMode}" id="emprunt" name="emprunt.id"
+                            class="form-select w-full border rounded p-2" required>
                             <option th:each="emp : ${emprunts}" th:value="${emp.id}" th:text="|Emprunt #${emp.id}|">
                                 Emprunt</option>
                         </select>
                     </div>
                     <div>
-                        <label for="dateDebut" class="block font-medium mb-1 text-custom-dark">Date de début</label>
-                        <input type="date" id="dateDebut" name="dateDebut" class="form-input w-full border rounded p-2"
-                            required th:value="${penalite.dateDebut}">
+                        <label class="block font-medium mb-1 text-custom-dark">Date de début</label>
+                        <div class="p-2 bg-gray-100 rounded"
+                            th:text="${penalite.dateDebut != null} ? ${#temporals.format(penalite.dateDebut, 'dd/MM/yyyy')} : '-'">
+                        </div>
+                        <input type="hidden" name="dateDebut" th:value="${penalite.dateDebut}">
                     </div>
                     <div>
                         <label for="jour" class="block font-medium mb-1 text-custom-dark">Nombre de jours</label>
@@ -55,6 +63,8 @@
                         <a href="/penalites"
                             class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Annuler</a>
                     </div>
+                    <input type="hidden" name="emprunt.id" th:value="*{emprunt.id}" th:if="${autoMode}">
+                    <input type="hidden" name="adherent.id" th:value="*{adherent.id}" th:if="${autoMode}">
                 </form>
             </main>
         </div>

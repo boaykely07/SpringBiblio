@@ -37,6 +37,7 @@
                                 <th class="py-2 px-4">Type</th>
                                 <th class="py-2 px-4">Date emprunt</th>
                                 <th class="py-2 px-4">Date retour prévue</th>
+                                <th class="py-2 px-4">Date retour réelle</th>
                                 <th class="py-2 px-4">Statut</th>
                                 <th class="py-2 px-4">Actions</th>
                             </tr>
@@ -53,8 +54,13 @@
                                 <td class="py-2 px-4"
                                     th:text="${#temporals.format(emprunt.dateEmprunt, 'dd/MM/yyyy HH:mm')}">
                                 </td>
+                                <td class="py-2 px-4" th:text="${dernieresProlongations[emprunt.id] != null} ?
+                                        ${#temporals.format(dernieresProlongations[emprunt.id], 'dd/MM/yyyy HH:mm')} :
+                                        ${#temporals.format(emprunt.dateRetourPrevue, 'dd/MM/yyyy HH:mm')}">
+                                </td>
                                 <td class="py-2 px-4"
-                                    th:text="${#temporals.format(emprunt.dateRetourPrevue, 'dd/MM/yyyy HH:mm')}"></td>
+                                    th:text="${emprunt.dateRetourReelle != null ? #temporals.format(emprunt.dateRetourReelle, 'dd/MM/yyyy HH:mm') : '-'}">
+                                </td>
                                 <td class="py-2 px-4" th:text="${statuts[emprunt.id]}"></td>
                                 <td class="py-2 px-4">
                                     <a th:href="@{'/emprunts/return/' + ${emprunt.id}}"
@@ -65,6 +71,7 @@
                             </tr>
                             <tr th:if="${#lists.isEmpty(emprunts)}">
                                 <td colspan="7" class="text-center py-4 text-gray-500">Aucun emprunt trouvé.</td>
+                                <td></td>
                             </tr>
                         </tbody>
                     </table>
