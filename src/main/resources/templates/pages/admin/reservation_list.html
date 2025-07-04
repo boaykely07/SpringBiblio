@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Réservations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Liste des réservations</h2>
+                <div th:if="${success}"
+                    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"
+                    th:text="${success}"></div>
+                <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+                    th:text="${error}"></div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead>
+                            <tr class="bg-custom-medium text-custom-darker">
+                                <th class="py-2 px-4">ID</th>
+                                <th class="py-2 px-4">Livre</th>
+                                <th class="py-2 px-4">Adhérent</th>
+                                <th class="py-2 px-4">Statut</th>
+                                <th class="py-2 px-4">Date demande</th>
+                                <th class="py-2 px-4">Date à réserver</th>
+                                <th class="py-2 px-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reservation : ${reservations}" class="border-b hover:bg-custom-light">
+                                <td class="py-2 px-4" th:text="${reservation.id}"></td>
+                                <td class="py-2 px-4" th:text="${reservation.livre.titre}"></td>
+                                <td class="py-2 px-4"
+                                    th:text="|${reservation.adherent.nom} ${reservation.adherent.prenom}|"></td>
+                                <td class="py-2 px-4" th:text="${statuts[reservation.id]}"></td>
+                                <td class="py-2 px-4"
+                                    th:text="${#temporals.format(reservation.dateDemande, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td class="py-2 px-4" th:text="${reservation.dateAReserver}"></td>
+                                <td class="py-2 px-4 flex gap-2">
+                                    <form th:action="@{'/reservations/valider/' + ${reservation.id}}" method="post"
+                                        th:if="${statuts[reservation.id]} == 'En attente'"
+                                        onsubmit="return confirm('Valider cette réservation ?')">
+                                        <button type="submit" class="text-green-600 hover:underline">Valider</button>
+                                    </form>
+                                    <a th:href="@{'/reservations/delete/' + ${reservation.id}}"
+                                        class="text-red-600 hover:underline">Supprimer</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(reservations)}">
+                                <td colspan="6" class="text-center py-4 text-gray-500">Aucune réservation trouvée.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>
