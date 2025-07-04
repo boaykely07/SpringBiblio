@@ -18,6 +18,7 @@
                 <form th:action="@{/livres}" th:object="${livre}" method="post"
                     class="space-y-4 bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark">
                     <div>
+                        <label for="titre" class="block font-medium mb-1 text-custom-dark">Titre</label>
                         <input type="text" id="titre" name="titre" th:field="*{titre}"
                             class="form-input w-full border rounded p-2" required>
                     </div>
