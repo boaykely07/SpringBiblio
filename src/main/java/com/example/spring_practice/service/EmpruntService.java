@@ -13,11 +13,16 @@ import com.example.spring_practice.model.entities.PenaliteEntity;
 import com.example.spring_practice.model.entities.ExemplaireEntity;
 import com.example.spring_practice.repository.AbonnementRepository;
 import com.example.spring_practice.model.entities.AbonnementEntity;
+import com.example.spring_practice.repository.DroitsEmpruntSpecifiquesRepository;
+import com.example.spring_practice.model.entities.DroitsEmpruntSpecifiquesEntity;
+import com.example.spring_practice.model.entities.LivreEntity;
+import com.example.spring_practice.model.entities.ProfilAdherentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +40,8 @@ public class EmpruntService {
     private PenaliteRepository penaliteRepository;
     @Autowired
     private AbonnementRepository abonnementRepository;
+    @Autowired
+    private DroitsEmpruntSpecifiquesRepository droitsEmpruntSpecifiquesRepository;
 
     public List<EmpruntEntity> findAll() {
         return empruntRepository.findAll();
@@ -48,6 +55,28 @@ public class EmpruntService {
         // Recharge l'adhérent pour avoir le profil complet
         AdherentEntity adherent = adherentRepository.findById(emprunt.getAdherent().getId())
             .orElseThrow(() -> new IllegalStateException("Adhérent introuvable"));
+        // Vérification des droits d'emprunt spécifiques (âge minimum)
+        ExemplaireEntity exemplaire = emprunt.getExemplaire();
+        if (exemplaire == null) {
+            throw new IllegalStateException("Aucun exemplaire sélectionné pour l'emprunt.");
+        }
+        LivreEntity livre = exemplaire.getLivre();
+        if (livre == null) {
+            throw new IllegalStateException("Aucun livre associé à l'exemplaire sélectionné.");
+        }
+        ProfilAdherentEntity profil = adherent.getProfil();
+        List<DroitsEmpruntSpecifiquesEntity> droits = droitsEmpruntSpecifiquesRepository.findAll();
+        for (DroitsEmpruntSpecifiquesEntity droit : droits) {
+            if (droit.getLivre().getId().equals(livre.getId()) && droit.getProfil().getId().equals(profil.getId())) {
+                Integer ageMin = droit.getAge();
+                if (ageMin != null) {
+                    int ageAdherent = Period.between(adherent.getDateNaissance(), emprunt.getDateEmprunt().toLocalDate()).getYears();
+                    if (ageAdherent < ageMin) {
+                        throw new IllegalStateException("L'âge minimum pour emprunter ce livre est de " + ageMin + " ans pour ce profil.");
+                    }
+                }
+            }
+        }
         // Vérification des pénalités en cours
         List<PenaliteEntity> penalites = penaliteRepository.findByAdherentId(adherent.getId());
         LocalDate dateEmprunt = emprunt.getDateEmprunt().toLocalDate();
@@ -67,7 +96,6 @@ public class EmpruntService {
             throw new IllegalStateException("L'adhérent a déjà atteint son quota d'emprunts simultanés.");
         }
         // Vérification de la disponibilité de l'exemplaire
-        ExemplaireEntity exemplaire = emprunt.getExemplaire();
         int quantiteTotale = exemplaire.getQuantite();
         List<EmpruntEntity> empruntsExemplaire = empruntRepository.findByExemplaireId(exemplaire.getId());
         int disponible = quantiteTotale;
@@ -91,6 +119,7 @@ public class EmpruntService {
             }
             // Statut 'Retard' : on ne fait rien pour la quantité
         }
+        System.out.println("Exemplaires disponibles pour l'exemplaire ID " + exemplaire.getId() + " : " + disponible);
         if (disponible <= 0) {
             throw new IllegalStateException("Aucun exemplaire disponible pour cet emprunt.");
         }

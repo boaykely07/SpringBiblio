@@ -68,19 +68,17 @@ public class ReservationController {
         try {
             LivreEntity livre = livreRepository.findById(livreId)
                 .orElseThrow(() -> new IllegalArgumentException("Livre introuvable"));
-            
             // TODO: Récupérer l'adhérent connecté (pour l'instant, on prend le premier)
             AdherentEntity adherent = adherentRepository.findAll().get(0);
-            
             ReservationEntity reservation = new ReservationEntity();
             reservation.setLivre(livre);
             reservation.setAdherent(adherent);
             reservation.setDateDemande(LocalDateTime.now());
             reservation.setDateAReserver(dateAReserver);
-            
             reservationService.save(reservation);
-            
-            return "redirect:/livres?success=Réservation créée avec succès";
+            model.addAttribute("livre", livre);
+            model.addAttribute("success", "Réservation créée avec succès");
+            return "pages/client/reserver_client";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la création de la réservation: " + e.getMessage());
             LivreEntity livre = livreRepository.findById(livreId)

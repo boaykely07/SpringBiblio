@@ -45,6 +45,23 @@
                             <option th:each="ed : ${editeurs}" th:value="${ed.id}" th:text="${ed.nom}"></option>
                         </select>
                     </div>
+                    <div>
+                        <label for="auteur" class="block font-medium mb-1 text-custom-dark">Auteur</label>
+                        <select id="auteur" name="auteur.id" th:field="*{auteur}"
+                            class="form-select w-full border rounded p-2" required>
+                            <option th:each="a : ${auteurs}" th:value="${a.id}" th:text="${a.nom + ' ' + a.prenom}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="categories" class="block font-medium mb-1 text-custom-dark">Catégories</label>
+                        <select id="categories" name="categories" th:field="*{categories}" multiple
+                            class="form-select w-full border rounded p-2">
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.nom}"></option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">(Maintenez Ctrl ou Cmd pour sélectionner plusieurs
+                            catégories)</p>
+                    </div>
                     <div class="flex items-center space-x-4 mt-4">
                         <button type="submit"
                             class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Valider</button>

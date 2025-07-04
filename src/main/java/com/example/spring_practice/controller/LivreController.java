@@ -5,6 +5,8 @@ import com.example.spring_practice.service.LivreService;
 import com.example.spring_practice.repository.LivreRepository;
 import com.example.spring_practice.model.entities.EditeurEntity;
 import com.example.spring_practice.repository.EditeurRepository;
+import com.example.spring_practice.repository.AuteurRepository;
+import com.example.spring_practice.repository.CategorieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +31,12 @@ public class LivreController {
     @Autowired
     private EditeurRepository editeurRepository;
 
+    @Autowired
+    private AuteurRepository auteurRepository;
+
+    @Autowired
+    private CategorieRepository categorieRepository;
+
     @GetMapping
     public String listLivres(Model model) {
         model.addAttribute("livres", livreRepository.findAll());
@@ -47,6 +55,8 @@ public class LivreController {
     public String newLivreForm(Model model) {
         model.addAttribute("livre", new LivreEntity());
         model.addAttribute("editeurs", editeurRepository.findAll());
+        model.addAttribute("auteurs", auteurRepository.findAll());
+        model.addAttribute("categories", categorieRepository.findAll());
         model.addAttribute("activePage", "livres");
         return "pages/admin/livre_form";
     }
@@ -55,5 +65,19 @@ public class LivreController {
     public String saveLivre(@ModelAttribute LivreEntity livre, Model model) {
         livreService.save(livre);
         return "redirect:/livres";
+    }
+
+    @GetMapping("/client/list")
+    public String listLivresClient(@RequestParam(value = "titre", required = false) String titre, Model model) {
+        List<LivreEntity> livres;
+        if (titre != null && !titre.isEmpty()) {
+            livres = livreService.findByTitreContainingIgnoreCase(titre);
+        } else {
+            livres = livreService.findAll();
+        }
+        model.addAttribute("livres", livres);
+        model.addAttribute("titre", titre);
+        model.addAttribute("activePage_client", "livres");
+        return "pages/client/livre_list";
     }
 } 
