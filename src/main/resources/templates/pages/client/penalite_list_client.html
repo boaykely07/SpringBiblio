@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mes pénalités</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar_client :: sidebar_client}"></div>
+        <div class="flex-1">
+            <div th:replace="~{fragments/sidebar_client :: header_client}"></div>
+            <main class="p-6 max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Mes pénalités</h2>
+                <div class="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded">
+                    Total de jours de pénalité : <span class="font-bold" th:text="${totalJours}"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead>
+                            <tr class="bg-custom-medium text-custom-darker">
+                                <th class="py-2 px-4">ID</th>
+                                <th class="py-2 px-4">Emprunt</th>
+                                <th class="py-2 px-4">Date début</th>
+                                <th class="py-2 px-4">Jours</th>
+                                <th class="py-2 px-4">Raison</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="penalite : ${penalites}" class="border-b hover:bg-custom-light">
+                                <td class="py-2 px-4" th:text="${penalite.id}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.emprunt.id}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.dateDebut}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.jour}"></td>
+                                <td class="py-2 px-4" th:text="${penalite.raison}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(penalites)}">
+                                <td colspan="5" class="text-center py-4 text-gray-500">Aucune pénalité trouvée.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>

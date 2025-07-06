@@ -17,6 +17,8 @@ import com.example.spring_practice.repository.DroitsEmpruntSpecifiquesRepository
 import com.example.spring_practice.model.entities.DroitsEmpruntSpecifiquesEntity;
 import com.example.spring_practice.model.entities.LivreEntity;
 import com.example.spring_practice.model.entities.ProfilAdherentEntity;
+import com.example.spring_practice.repository.ProlongementRepository;
+import com.example.spring_practice.model.entities.ProlongementEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,8 @@ public class EmpruntService {
     private AbonnementRepository abonnementRepository;
     @Autowired
     private DroitsEmpruntSpecifiquesRepository droitsEmpruntSpecifiquesRepository;
+    @Autowired
+    private ProlongementRepository prolongementRepository;
 
     public List<EmpruntEntity> findAll() {
         return empruntRepository.findAll();
@@ -105,15 +109,14 @@ public class EmpruntService {
         int disponible = quantiteTotale;
         for (EmpruntEntity e : empruntsExemplaire) {
             String statut = getLastStatutForEmprunt(e.getId());
-            // Vérification de chevauchement de période pour "En cours" ou "Retard"
-            if ("En cours".equalsIgnoreCase(statut) || "Retard".equalsIgnoreCase(statut)) {
+            if ("En cours".equalsIgnoreCase(statut)) {
                 LocalDateTime debutExist = e.getDateEmprunt();
                 LocalDateTime finExist = e.getDateRetourPrevue();
                 LocalDateTime debutNouveau = emprunt.getDateEmprunt();
                 LocalDateTime finNouveau = emprunt.getDateRetourPrevue();
                 boolean chevauche = !finNouveau.isBefore(debutExist) && !debutNouveau.isAfter(finExist);
                 if (chevauche) {
-                    throw new IllegalStateException("Un autre emprunt pour cet exemplaire chevauche la période demandée (statut 'En cours' ou 'Retard').");
+                    throw new IllegalStateException("Un autre emprunt pour cet exemplaire chevauche la période demandée (statut 'En cours').");
                 }
             }
             if ("En cours".equalsIgnoreCase(statut)) {
@@ -121,7 +124,6 @@ public class EmpruntService {
             } else if ("Rendu".equalsIgnoreCase(statut)) {
                 disponible += 1;
             }
-            // Statut 'Retard' : on ne fait rien pour la quantité
         }
         System.out.println("Exemplaires disponibles pour l'exemplaire ID " + exemplaire.getId() + " : " + disponible);
         if (disponible <= 0) {
@@ -153,16 +155,24 @@ public class EmpruntService {
         empruntRepository.deleteById(id);
     }
 
-    public void returnEmprunt(Long empruntId) {
+    public void returnEmprunt(Long empruntId, LocalDateTime dateRetour) {
         EmpruntEntity emprunt = empruntRepository.findById(empruntId)
             .orElseThrow(() -> new IllegalArgumentException("Emprunt non trouvé"));
-        StatutEmpruntEntity statutRendu = statutEmpruntRepository.findByCodeStatut("Rendu")
+        emprunt.setDateRetourReelle(dateRetour);
+        // Vérification de la date prévue avec prolongement
+        LocalDateTime datePrevue = emprunt.getDateRetourPrevue();
+        ProlongementEntity prolongement = prolongementRepository.findTopByEmpruntIdOrderByDateFinDesc(empruntId);
+        if (prolongement != null && prolongement.getDateFin() != null) {
+            datePrevue = prolongement.getDateFin();
+        }
+        StatutEmpruntEntity statut = statutEmpruntRepository.findByCodeStatut("Rendu")
             .orElseThrow(() -> new IllegalStateException("Statut 'Rendu' introuvable"));
         MvtEmpruntEntity mvt = new MvtEmpruntEntity();
         mvt.setEmprunt(emprunt);
-        mvt.setStatutNouveau(statutRendu);
-        mvt.setDateMouvement(LocalDateTime.now());
+        mvt.setStatutNouveau(statut);
+        mvt.setDateMouvement(dateRetour);
         mvtEmpruntRepository.save(mvt);
+        empruntRepository.save(emprunt);
     }
 
     public String getLastStatutForEmprunt(Long empruntId) {

@@ -53,24 +53,21 @@ public class PenaliteController {
 
     @PostMapping
     public String savePenalite(@ModelAttribute PenaliteEntity penalite, Model model) {
-        // Vérifier le statut de l'emprunt
-        String statut = empruntService.getLastStatutForEmprunt(penalite.getEmprunt().getId());
-        if ("Rendu".equalsIgnoreCase(statut)) {
-            model.addAttribute("penalite", penalite);
-            model.addAttribute("adherents", adherentRepository.findAll());
-            model.addAttribute("emprunts", empruntRepository.findAll());
-            model.addAttribute("error", "Impossible d'ajouter une pénalité sur un emprunt déjà rendu.");
+        // Correction pour le mode auto : recharger l'emprunt et l'adhérent si besoin
+        if (penalite.getEmprunt() == null || penalite.getEmprunt().getId() == null) {
+            model.addAttribute("error", "Emprunt manquant pour la pénalité.");
             return "pages/admin/penalite_form";
         }
+        EmpruntEntity emprunt = empruntRepository.findById(penalite.getEmprunt().getId()).orElse(null);
+        if (emprunt == null) {
+            model.addAttribute("error", "Emprunt introuvable.");
+            return "pages/admin/penalite_form";
+        }
+        penalite.setEmprunt(emprunt);
+        penalite.setAdherent(emprunt.getAdherent());
+        // Vérifier le statut de l'emprunt
+        String statut = empruntService.getLastStatutForEmprunt(emprunt.getId());
         penaliteService.save(penalite);
-        // Changer le statut de l'emprunt en 'Retard'
-        StatutEmpruntEntity statutRetard = statutEmpruntRepository.findByCodeStatut("Retard")
-            .orElseThrow(() -> new IllegalStateException("Statut 'Retard' introuvable"));
-        MvtEmpruntEntity mvt = new MvtEmpruntEntity();
-        mvt.setEmprunt(penalite.getEmprunt());
-        mvt.setStatutNouveau(statutRetard);
-        mvt.setDateMouvement(LocalDateTime.now());
-        mvtEmpruntRepository.save(mvt);
         return "redirect:/penalites";
     }
 
@@ -78,5 +75,32 @@ public class PenaliteController {
     public String deletePenalite(@PathVariable Long id) {
         penaliteService.deleteById(id);
         return "redirect:/penalites";
+    }
+
+    @GetMapping("/auto")
+    public String autoPenaliteForm(@RequestParam Long empruntId, @RequestParam java.time.LocalDate dateDebut, Model model) {
+        EmpruntEntity emprunt = empruntRepository.findById(empruntId).orElse(null);
+        if (emprunt == null) {
+            return "redirect:/emprunts";
+        }
+        PenaliteEntity penalite = new PenaliteEntity();
+        penalite.setEmprunt(emprunt);
+        penalite.setAdherent(emprunt.getAdherent());
+        penalite.setDateDebut(dateDebut);
+        model.addAttribute("penalite", penalite);
+        model.addAttribute("autoMode", true);
+        return "pages/admin/penalite_form";
+    }
+
+    // Affichage des pénalités pour le client connecté
+    @GetMapping("/client")
+    public String listPenalitesClient(Model model) {
+        // TODO: Récupérer l'adhérent connecté dynamiquement
+        AdherentEntity adherent = adherentRepository.findAll().get(0); // à remplacer par l'authentification réelle
+        List<PenaliteEntity> penalites = penaliteService.findByAdherentId(adherent.getId());
+        int totalJours = penalites.stream().mapToInt(PenaliteEntity::getJour).sum();
+        model.addAttribute("penalites", penalites);
+        model.addAttribute("totalJours", totalJours);
+        return "pages/client/penalite_list_client";
     }
 }

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface PenaliteRepository extends JpaRepository<PenaliteEntity, Long> {
     List<PenaliteEntity> findByAdherentId(Long adherentId);
+    // Récupère la pénalité avec la date de fin la plus tardive pour un adhérent
+    PenaliteEntity findTopByAdherentIdOrderByDateDebutDesc(Long adherentId);
 } 

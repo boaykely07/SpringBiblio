@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Retour d'emprunt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6 max-w-xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Retour d'emprunt</h2>
+                <form th:action="@{'/emprunts/return/' + ${emprunt.id}}" method="post"
+                    class="bg-white rounded-xl shadow-md p-6">
+                    <div class="mb-4">
+                        <label for="dateRetour" class="block font-medium mb-2 text-custom-dark">Date et heure de
+                            retour</label>
+                        <input type="datetime-local" id="dateRetour" name="dateRetour"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-custom-dark focus:border-transparent"
+                            required />
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4">
+                        <button type="submit"
+                            class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Valider
+                            le retour</button>
+                        <a th:href="@{/emprunts}"
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Annuler</a>
+                    </div>
+                </form>
+                <div th:if="${penalite != null}">
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold text-red-700 mb-4">Pénalité à appliquer</h3>
+                        <form th:action="@{/penalites}" th:object="${penalite}" method="post"
+                            class="space-y-4 bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500 max-w-xl">
+                            <div>
+                                <label class="block font-medium mb-1 text-custom-dark">Adhérent</label>
+                                <div class="p-2 bg-gray-100 rounded"
+                                    th:text="*{adherent.nom} + ' ' + *{adherent.prenom}"></div>
+                                <input type="hidden" name="adherent.id" th:value="*{adherent.id}">
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1 text-custom-dark">Emprunt</label>
+                                <div class="p-2 bg-gray-100 rounded" th:text="'Emprunt #' + *{emprunt.id}"></div>
+                                <input type="hidden" name="emprunt.id" th:value="*{emprunt.id}">
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1 text-custom-dark">Date de début</label>
+                                <div class="p-2 bg-gray-100 rounded"
+                                    th:text="*{dateDebut != null} ? ${#temporals.format(dateDebut, 'dd/MM/yyyy')} : '-'">
+                                </div>
+                                <input type="hidden" name="dateDebut" th:value="*{dateDebut}">
+                            </div>
+                            <div>
+                                <label for="raison" class="block font-medium mb-1 text-custom-dark">Raison</label>
+                                <input type="text" id="raison" name="raison"
+                                    class="form-input w-full border rounded p-2" th:value="*{raison}">
+                            </div>
+                            <input type="hidden" id="jour" name="jour" th:value="*{jour}">
+                            <div class="flex items-center space-x-4 mt-4">
+                                <button type="submit"
+                                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Valider
+                                    la pénalité</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>

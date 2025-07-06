@@ -29,6 +29,9 @@ public class EmpruntEntity {
     @Column(name = "date_retour_prevue", nullable = false)
     private LocalDateTime dateRetourPrevue;
 
+    @Column(name = "date_retour_reelle")
+    private LocalDateTime dateRetourReelle;
+
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -42,4 +45,6 @@ public class EmpruntEntity {
     public void setDateEmprunt(LocalDateTime dateEmprunt) { this.dateEmprunt = dateEmprunt; }
     public LocalDateTime getDateRetourPrevue() { return dateRetourPrevue; }
     public void setDateRetourPrevue(LocalDateTime dateRetourPrevue) { this.dateRetourPrevue = dateRetourPrevue; }
+    public LocalDateTime getDateRetourReelle() { return dateRetourReelle; }
+    public void setDateRetourReelle(LocalDateTime dateRetourReelle) { this.dateRetourReelle = dateRetourReelle; }
 } 
