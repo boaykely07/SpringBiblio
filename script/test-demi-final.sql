@@ -1,3 +1,23 @@
+Le resaka prolongement(mbola mety ve) mila angatahana zay vao validen admin aveo 
+SELECT e.id_emprunt, e.id_adherent, a.nom, a.prenom, l.titre
+FROM Emprunts e
+JOIN Adherents a ON e.id_adherent = a.id_adherent
+JOIN Exemplaires ex ON e.id_exemplaire = ex.id_exemplaire
+JOIN Livres l ON ex.id_livre = l.id_livre 
+
+SELECT m.id_emprunt, s.code_statut
+FROM Mvt_Emprunt m
+JOIN Statuts_Emprunt s ON m.id_statut_nouveau = s.id_statut
+WHERE m.id_emprunt = 3
+ORDER BY m.date_mouvement DESC
+LIMIT 1;
+
+
+
+
+
+
+
 -- Supprimer toutes les données existantes pour un jeu de test propre (optionnel)
 -- TRUNCATE TABLE ... CASCADE; -- Attention, cette commande est destructive.
 

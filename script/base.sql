@@ -126,6 +126,7 @@ CREATE TABLE Emprunts (
     id_type_emprunt INT NOT NULL,
     date_emprunt TIMESTAMP NOT NULL,
     date_retour_prevue TIMESTAMP NOT NULL,
+    date_retour_reelle TIMESTAMP NULL,
     FOREIGN KEY (id_type_emprunt) REFERENCES Type_emprunts(id_type_emprunt),
     FOREIGN KEY (id_exemplaire) REFERENCES Exemplaires(id_exemplaire),
     FOREIGN KEY (id_adherent) REFERENCES Adherents(id_adherent)
@@ -183,3 +184,24 @@ CREATE TABLE Prolongements (
     date_prolongement TIMESTAMP NOT NULL,
     FOREIGN KEY (id_emprunt) REFERENCES Emprunts(id_emprunt) ON DELETE CASCADE
 );
+
+-- Table des statuts de prolongement
+CREATE TABLE Statuts_Prolongement (
+    id_statut SERIAL PRIMARY KEY,
+    code_statut VARCHAR(20) NOT NULL UNIQUE
+);
+
+-- Table des mouvements de prolongement
+CREATE TABLE Mvt_Prolongement (
+    id_mvt_prolongement SERIAL PRIMARY KEY,
+    id_prolongement INT NOT NULL,
+    id_statut_nouveau INT NOT NULL, -- Le statut vers lequel le prolongement a transité
+    date_mouvement TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_prolongement) REFERENCES Prolongements(id_prolongement) ON DELETE CASCADE,
+    FOREIGN KEY (id_statut_nouveau) REFERENCES Statuts_Prolongement(id_statut)
+);
+
+
+INSERT INTO Statuts_Prolongement (code_statut) VALUES ('En attente');
+INSERT INTO Statuts_Prolongement (code_statut) VALUES ('Validée');
+INSERT INTO Statuts_Prolongement (code_statut) VALUES ('Annulée');

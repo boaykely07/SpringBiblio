@@ -44,6 +44,14 @@
                 </svg>
                 Mes réservations
             </a>
+            <a href="/prolongements/client"
+               th:classappend="${activePage_client} == 'prolongements' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+               class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 2a2 2 0 00-2 2v12a2 2 0 002 2h4a2 2 0 002-2V4a2 2 0 00-2-2H8zm0 2h4v12H8V4z"/>
+                </svg>
+                Prolongements
+            </a>
             <a href="/penalites/client"
                 th:classappend="${activePage_client} == 'penalites' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
                 class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
