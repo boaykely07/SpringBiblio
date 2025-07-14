@@ -19,14 +19,14 @@
                     <div>
                         <label for="emprunt" class="block font-medium mb-1">Emprunt à prolonger</label>
                         <select id="emprunt" name="emprunt.id" th:field="*{emprunt.id}" class="w-full border rounded px-3 py-2">
-                            <option th:each="emprunt : ${emprunts}" th:value="${emprunt.id}" th:text="'Emprunt #' + ${emprunt.id}"></option>
+                            <option th:each="emprunt : ${emprunts}" th:value="${emprunt.id}" th:text="'Emprunt #' + ${emprunt.id} + ' - ' + ${emprunt.adherent.nom} + ' ' + ${emprunt.adherent.prenom}"></option>
                         </select>
                     </div>
                     <div>
                         <label for="dateFin" class="block font-medium mb-1">Nouvelle date de fin</label>
                         <input type="datetime-local" id="dateFin" name="dateFin" th:field="*{dateFin}" class="w-full border rounded px-3 py-2" required />
                     </div>
-                    <div th:if="${error}" class="text-red-600">[[${error}]]</div>
+                    <div th:if="${error}" th:text="${error}" class="text-red-600"></div>
                     <button type="submit" class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Envoyer la demande</button>
                 </form>
             </main>

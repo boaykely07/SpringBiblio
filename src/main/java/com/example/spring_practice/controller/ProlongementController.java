@@ -163,6 +163,18 @@ public class ProlongementController {
         System.out.println("[DEBUG] Utilisateur connecté id=" + utilisateur.getId() + ", email=" + utilisateur.getEmail());
         System.out.println("[DEBUG] Adhérent trouvé : " + (adherent != null ? adherent.getNom() : "Aucun"));
         List<EmpruntEntity> emprunts = prolongementService.getEmpruntsProlongeablesPourAdherent(adherent);
+        // Log et filtrage pour éviter les erreurs Thymeleaf
+        emprunts = emprunts.stream()
+            .filter(e -> {
+                if (e.getAdherent() == null) {
+                    System.out.println("[ERREUR] Emprunt #" + e.getId() + " n'a pas d'adhérent !");
+                    return false;
+                } else {
+                    System.out.println("[DEBUG] Emprunt #" + e.getId() + " - Adhérent : " + e.getAdherent().getNom() + " " + e.getAdherent().getPrenom());
+                    return true;
+                }
+            })
+            .toList();
         model.addAttribute("prolongement", new ProlongementEntity());
         model.addAttribute("emprunts", emprunts);
         model.addAttribute("activePage_client", "prolongements");
@@ -195,8 +207,18 @@ public class ProlongementController {
             model.addAttribute("activePage_client", "prolongements");
             return "pages/client/prolongement_form";
         }
-        // Vérifier la date
-        if (prolongement.getDateFin() == null || !prolongement.getDateFin().isAfter(emprunt.getDateRetourPrevue())) {
+        // Vérification des dates
+        if (prolongement.getDateFin() == null) {
+            model.addAttribute("error", "Veuillez choisir une nouvelle date de fin.");
+            model.addAttribute("activePage_client", "prolongements");
+            return "pages/client/prolongement_form";
+        }
+        if (prolongement.getDateFin().isBefore(emprunt.getDateEmprunt())) {
+            model.addAttribute("error", "La nouvelle date de fin ne peut pas être avant la date d'emprunt.");
+            model.addAttribute("activePage_client", "prolongements");
+            return "pages/client/prolongement_form";
+        }
+        if (!prolongement.getDateFin().isAfter(emprunt.getDateRetourPrevue())) {
             model.addAttribute("error", "La nouvelle date de fin doit être postérieure à la date de fin actuelle de l'emprunt.");
             model.addAttribute("activePage_client", "prolongements");
             return "pages/client/prolongement_form";
