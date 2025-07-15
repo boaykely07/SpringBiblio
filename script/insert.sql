@@ -1,6 +1,6 @@
 -- Insertion de profils d'adhérent exemples
 INSERT INTO Profils_Adherent (nom_profil, quota_emprunts_simultanes, quota_penalites_jours) VALUES
-  ('Etudiant', 3, 10),
+  ('Etudiant', 2, 10),
   ('Professeur', 2, 5),
   ('Public', 5, 7);
 
