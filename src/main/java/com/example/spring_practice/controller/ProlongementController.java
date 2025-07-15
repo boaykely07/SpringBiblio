@@ -19,6 +19,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
+import com.example.spring_practice.model.entities.UtilisateurEntity;
+import jakarta.servlet.http.HttpSession;
+import com.example.spring_practice.model.entities.MvtProlongementEntity;
+import java.util.*;
+import com.example.spring_practice.model.entities.AdherentEntity;
+import com.example.spring_practice.model.entities.EmpruntEntity;
+import com.example.spring_practice.model.entities.ProlongementEntity;
+import com.example.spring_practice.model.entities.MvtProlongementEntity;
 
 @Controller
 @RequestMapping("/prolongements")
@@ -39,11 +47,11 @@ public class ProlongementController {
     @GetMapping
     public String listProlongements(Model model) {
         List<ProlongementEntity> prolongements = prolongementService.findAll();
-        java.util.Map<Long, String> statutsProlongement = new java.util.HashMap<>();
+        Map<Long, String> statutsProlongement = new HashMap<>();
         for (ProlongementEntity p : prolongements) {
-            com.example.spring_practice.model.entities.MvtProlongementEntity mvt = mvtProlongementRepository.findAll().stream()
+            MvtProlongementEntity mvt = mvtProlongementRepository.findAll().stream()
                 .filter(m -> m.getProlongement().getId().equals(p.getId()))
-                .max(java.util.Comparator.comparing(com.example.spring_practice.model.entities.MvtProlongementEntity::getDateMouvement))
+                .max(Comparator.comparing(MvtProlongementEntity::getDateMouvement))
                 .orElse(null);
             statutsProlongement.put(p.getId(), mvt != null ? mvt.getStatutNouveau().getCodeStatut() : "Inconnu");
         }
@@ -113,9 +121,23 @@ public class ProlongementController {
 
     // Affichage du formulaire de demande de prolongement côté client
     @GetMapping("/client/new")
-    public String newProlongementClientForm(@RequestParam(required = false) Long livreId, @RequestParam(required = false) Long empruntId, Model model) {
-        // TODO: remplacer par l'adhérent connecté
-        com.example.spring_practice.model.entities.AdherentEntity adherent = adherentRepository.findAll().get(0);
+    public String newProlongementClientForm(@RequestParam(required = false) Long livreId, @RequestParam(required = false) Long empruntId, Model model, HttpSession session) {
+        UtilisateurEntity utilisateur = (UtilisateurEntity) session.getAttribute("user");
+        if (utilisateur == null) {
+            model.addAttribute("error", "Vous devez être connecté pour demander un prolongement.");
+            model.addAttribute("prolongement", new com.example.spring_practice.model.entities.ProlongementEntity());
+            model.addAttribute("emprunts", java.util.List.of());
+            model.addAttribute("clientMode", true);
+            return "pages/client/prolongement_form_client";
+        }
+        AdherentEntity adherent = adherentRepository.findByUtilisateurId(utilisateur.getId());
+        if (adherent == null) {
+            model.addAttribute("error", "Aucun profil adhérent trouvé pour cet utilisateur.");
+            model.addAttribute("prolongement", new com.example.spring_practice.model.entities.ProlongementEntity());
+            model.addAttribute("emprunts", java.util.List.of());
+            model.addAttribute("clientMode", true);
+            return "pages/client/prolongement_form_client";
+        }
         java.util.List<com.example.spring_practice.model.entities.EmpruntEntity> emprunts;
         if (empruntId != null) {
             emprunts = java.util.List.of(empruntRepository.findById(empruntId).orElse(null));

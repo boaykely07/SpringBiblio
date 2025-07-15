@@ -93,9 +93,10 @@ CREATE TABLE Livres_Categories (
 CREATE TABLE Exemplaires (
     id_exemplaire SERIAL PRIMARY KEY,
     id_livre INT NOT NULL,
-    quantite INT NOT NULL,
     FOREIGN KEY (id_livre) REFERENCES Livres(id_livre) ON DELETE CASCADE
 );
+
+
 
 CREATE TABLE Abonnements (
     id_abonnement SERIAL PRIMARY KEY,

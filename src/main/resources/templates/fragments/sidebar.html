@@ -37,7 +37,7 @@
                 Livres
             </a>
 
-            <a href="#"
+            <a href="/membres"
                 th:classappend="${activePage} == 'membres' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
                 class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
                 <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
@@ -46,6 +46,16 @@
                     </path>
                 </svg>
                 Membres
+            </a>
+
+            <a href="/profils-adherent/list"
+                th:classappend="${activePage} == 'profils-adherent' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
+                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
+                <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M10 2a4 4 0 00-4 4v2a4 4 0 004 4 4 4 0 004-4V6a4 4 0 00-4-4zm-6 8a6 6 0 1112 0v2a6 6 0 01-12 0v-2z" />
+                </svg>
+                Profil adhérent
             </a>
 
             <a href="/emprunts"
@@ -100,17 +110,6 @@
                         clip-rule="evenodd"></path>
                 </svg>
                 Réservations
-            </a>
-
-            <a href="#"
-                th:classappend="${activePage} == 'rapports' ? 'bg-custom-light border-r-4 border-custom-dark text-custom-darker' : 'text-gray-600'"
-                class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-custom-light hover:text-custom-darker group">
-                <svg class="w-5 h-5 mr-3 group-hover:text-custom-dark" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                Rapports
             </a>
         </nav>
 

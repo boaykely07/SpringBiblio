@@ -28,6 +28,7 @@
                                 <th class="py-2 px-4">Année</th>
                                 <th class="py-2 px-4">Éditeur</th>
                                 <th class="py-2 px-4">Auteur</th>
+                                <th class="py-2 px-4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -40,9 +41,14 @@
                                 <td class="py-2 px-4"
                                     th:text="${livre.auteur != null ? livre.auteur.nom + ' ' + livre.auteur.prenom : ''}">
                                 </td>
+                                <td class="py-2 px-4">
+                                    <button type="button"
+                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-800 transition voir-details-btn"
+                                        th:data-id="${livre.id}">Voir détails</button>
+                                </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(livres)}">
-                                <td colspan="6" class="text-center py-4 text-gray-500">Aucun livre trouvé.</td>
+                                <td colspan="7" class="text-center py-4 text-gray-500">Aucun livre trouvé.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -52,6 +58,59 @@
     </div>
     <script th:src="@{/js/main.js}"></script>
     <script th:src="@{/js/config_tailwind.js}"></script>
+    <!-- Modal pour afficher les détails du livre -->
+    <div id="modal-details" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button id="close-modal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">&times;</button>
+            <h3 class="text-xl font-bold mb-4">Détails du livre</h3>
+            <div id="modal-content-details">
+                <!-- Les détails seront injectés ici -->
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.voir-details-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                fetch(`/livres/api/${id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let html = '';
+                        if (data.error) {
+                            html = `<div class='text-red-600'>${data.error}</div>`;
+                        } else {
+                            html = `<ul class='space-y-2'>
+                                <li><b>ID :</b> ${data.id}</li>
+                                <li><b>Titre :</b> ${data.titre}</li>
+                                <li><b>ISBN :</b> ${data.isbn}</li>
+                                <li><b>Année :</b> ${data.anneePublication}</li>
+                                <li><b>Éditeur :</b> ${data.editeur || '-'}</li>
+                                <li><b>Auteur :</b> ${data.auteur || '-'}</li>
+                                <li><b>Nombre d'exemplaires :</b> ${data.nbExemplaires}</li>
+                            </ul>`;
+                            if (data.exemplaires && data.exemplaires.length > 0) {
+                                html += `<div class='mt-4'><b>Exemplaires :</b><ul class='mt-2 space-y-1'>`;
+                                data.exemplaires.forEach(ex => {
+                                    html += `<li>${ex.label} : <span class='${ex.disponible ? 'text-green-600' : 'text-red-600'}'>${ex.disponible ? 'Disponible' : 'Non disponible'}</span></li>`;
+                                });
+                                html += `</ul></div>`;
+                            }
+                        }
+                        document.getElementById('modal-content-details').innerHTML = html;
+                        document.getElementById('modal-details').classList.remove('hidden');
+                    });
+            });
+        });
+        document.getElementById('close-modal').addEventListener('click', function () {
+            document.getElementById('modal-details').classList.add('hidden');
+        });
+        // Fermer la modal si on clique en dehors
+        document.getElementById('modal-details').addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -3,6 +3,8 @@ package com.example.spring_practice.controller;
 import com.example.spring_practice.model.entities.PenaliteEntity;
 import com.example.spring_practice.model.entities.AdherentEntity;
 import com.example.spring_practice.model.entities.EmpruntEntity;
+import com.example.spring_practice.model.entities.ProlongementEntity;
+import com.example.spring_practice.model.entities.MvtProlongementEntity;
 import com.example.spring_practice.service.PenaliteService;
 import com.example.spring_practice.repository.AdherentRepository;
 import com.example.spring_practice.repository.EmpruntRepository;
@@ -11,13 +13,15 @@ import com.example.spring_practice.model.entities.StatutEmpruntEntity;
 import com.example.spring_practice.model.entities.MvtEmpruntEntity;
 import com.example.spring_practice.repository.StatutEmpruntRepository;
 import com.example.spring_practice.repository.MvtEmpruntRepository;
+import com.example.spring_practice.model.entities.UtilisateurEntity;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.time.LocalDateTime;
 
 @Controller
@@ -94,9 +98,21 @@ public class PenaliteController {
 
     // Affichage des pénalités pour le client connecté
     @GetMapping("/client")
-    public String listPenalitesClient(Model model) {
-        // TODO: Récupérer l'adhérent connecté dynamiquement
-        AdherentEntity adherent = adherentRepository.findAll().get(0); // à remplacer par l'authentification réelle
+    public String listPenalitesClient(Model model, HttpSession session) {
+        UtilisateurEntity utilisateur = (UtilisateurEntity) session.getAttribute("user");
+        if (utilisateur == null) {
+            model.addAttribute("error", "Vous devez être connecté pour voir vos pénalités.");
+            model.addAttribute("penalites", java.util.List.of());
+            model.addAttribute("totalJours", 0);
+            return "pages/client/penalite_list_client";
+        }
+        AdherentEntity adherent = adherentRepository.findByUtilisateurId(utilisateur.getId());
+        if (adherent == null) {
+            model.addAttribute("error", "Aucun profil adhérent trouvé pour cet utilisateur.");
+            model.addAttribute("penalites", java.util.List.of());
+            model.addAttribute("totalJours", 0);
+            return "pages/client/penalite_list_client";
+        }
         List<PenaliteEntity> penalites = penaliteService.findByAdherentId(adherent.getId());
         int totalJours = penalites.stream().mapToInt(PenaliteEntity::getJour).sum();
         model.addAttribute("penalites", penalites);

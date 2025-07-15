@@ -1,10 +1,11 @@
 package com.example.spring_practice.controller;
 
-import com.example.spring_practice.model.entities.ReservationEntity;
+import com.example.spring_practice.model.entities.*;
 import com.example.spring_practice.model.entities.LivreEntity;
 import com.example.spring_practice.model.entities.AdherentEntity;
 import com.example.spring_practice.model.entities.MvtReservationEntity;
 import com.example.spring_practice.model.entities.StatutReservationEntity;
+import com.example.spring_practice.model.entities.UtilisateurEntity;
 import com.example.spring_practice.service.ReservationService;
 import com.example.spring_practice.repository.LivreRepository;
 import com.example.spring_practice.repository.AdherentRepository;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/reservations")
@@ -64,12 +66,23 @@ public class ReservationController {
     @PostMapping("/new")
     public String createReservation(@RequestParam Long livreId, 
                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateAReserver,
-                                   Model model) {
+                                   Model model,
+                                   HttpSession session) {
         try {
             LivreEntity livre = livreRepository.findById(livreId)
                 .orElseThrow(() -> new IllegalArgumentException("Livre introuvable"));
-            // TODO: Récupérer l'adhérent connecté (pour l'instant, on prend le premier)
-            AdherentEntity adherent = adherentRepository.findAll().get(0);
+            UtilisateurEntity utilisateur = (UtilisateurEntity) session.getAttribute("user");
+            if (utilisateur == null) {
+                model.addAttribute("error", "Vous devez être connecté pour réserver.");
+                model.addAttribute("livre", livre);
+                return "pages/client/reserver_client";
+            }
+            AdherentEntity adherent = adherentRepository.findByUtilisateurId(utilisateur.getId());
+            if (adherent == null) {
+                model.addAttribute("error", "Aucun profil adhérent trouvé pour cet utilisateur.");
+                model.addAttribute("livre", livre);
+                return "pages/client/reserver_client";
+            }
             ReservationEntity reservation = new ReservationEntity();
             reservation.setLivre(livre);
             reservation.setAdherent(adherent);
@@ -77,7 +90,7 @@ public class ReservationController {
             reservation.setDateAReserver(dateAReserver);
             reservationService.save(reservation);
             model.addAttribute("livre", livre);
-            model.addAttribute("success", "Réservation créée avec succès");
+            model.addAttribute("success", "Réservation créée avec succès.");
             return "pages/client/reserver_client";
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la création de la réservation: " + e.getMessage());

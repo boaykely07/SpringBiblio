@@ -24,11 +24,11 @@ import com.example.spring_practice.model.entities.MvtProlongementEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class EmpruntService {
@@ -107,32 +107,6 @@ public class EmpruntService {
         if (actifs >= quota) {
             throw new IllegalStateException("L'adhérent a déjà atteint son quota d'emprunts simultanés.");
         }
-        // Vérification de la disponibilité de l'exemplaire
-        int quantiteTotale = exemplaire.getQuantite();
-        List<EmpruntEntity> empruntsExemplaire = empruntRepository.findByExemplaireId(exemplaire.getId());
-        int disponible = quantiteTotale;
-        for (EmpruntEntity e : empruntsExemplaire) {
-            String statut = getLastStatutForEmprunt(e.getId());
-            if ("En cours".equalsIgnoreCase(statut)) {
-                LocalDateTime debutExist = e.getDateEmprunt();
-                LocalDateTime finExist = e.getDateRetourPrevue();
-                LocalDateTime debutNouveau = emprunt.getDateEmprunt();
-                LocalDateTime finNouveau = emprunt.getDateRetourPrevue();
-                boolean chevauche = !finNouveau.isBefore(debutExist) && !debutNouveau.isAfter(finExist);
-                if (chevauche) {
-                    throw new IllegalStateException("Un autre emprunt pour cet exemplaire chevauche la période demandée (statut 'En cours').");
-                }
-            }
-            if ("En cours".equalsIgnoreCase(statut)) {
-                disponible -= 1;
-            } else if ("Rendu".equalsIgnoreCase(statut)) {
-                disponible += 1;
-            }
-        }
-        System.out.println("Exemplaires disponibles pour l'exemplaire ID " + exemplaire.getId() + " : " + disponible);
-        if (disponible <= 0) {
-            throw new IllegalStateException("Aucun exemplaire disponible pour cet emprunt.");
-        }
         // Vérification de l'abonnement actif
         List<AbonnementEntity> abonnements = abonnementRepository.findByAdherentId(adherent.getId());
         boolean actif = abonnements.stream().anyMatch(ab ->
@@ -189,8 +163,41 @@ public class EmpruntService {
             .orElse("Inconnu");
     }
 
-    public java.util.List<EmpruntEntity> findByAdherentId(Long adherentId) {
+    public List<EmpruntEntity> findByAdherentId(Long adherentId) {
         return empruntRepository.findByAdherentId(adherentId);
+    }
+
+    public boolean isExemplaireDisponible(Long exemplaireId, LocalDateTime dateDebut) {
+        System.out.println("Vérif dispo exemplaire " + exemplaireId + " à la date " + dateDebut);
+        List<EmpruntEntity> emprunts = empruntRepository.findByExemplaireId(exemplaireId);
+        for (EmpruntEntity e : emprunts) {
+            String statut = getLastStatutForEmprunt(e.getId());
+            if ("En cours".equalsIgnoreCase(statut)) {
+                // Si la date de début de l'emprunt demandé est comprise dans un emprunt en cours, il n'est pas dispo
+                LocalDateTime debutExist = e.getDateEmprunt();
+                LocalDateTime finExist = e.getDateRetourPrevue();
+                if (!dateDebut.isBefore(debutExist) && !dateDebut.isAfter(finExist)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean isExemplaireDisponiblePourPeriode(Long exemplaireId, LocalDateTime debutNouveau, LocalDateTime finNouveau) {
+        List<EmpruntEntity> emprunts = empruntRepository.findByExemplaireId(exemplaireId);
+        for (EmpruntEntity e : emprunts) {
+            String statut = getLastStatutForEmprunt(e.getId());
+            if ("En cours".equalsIgnoreCase(statut)) {
+                LocalDateTime debutExist = e.getDateEmprunt();
+                LocalDateTime finExist = e.getDateRetourPrevue();
+                boolean chevauche = !finNouveau.isBefore(debutExist) && !debutNouveau.isAfter(finExist);
+                if (chevauche) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -199,7 +206,7 @@ public class EmpruntService {
     private MvtProlongementEntity getLastMvtProlongement(Long prolongementId) {
         return mvtProlongementRepository.findAll().stream()
             .filter(m -> m.getProlongement().getId().equals(prolongementId))
-            .max(java.util.Comparator.comparing(MvtProlongementEntity::getDateMouvement))
+            .max(Comparator.comparing(MvtProlongementEntity::getDateMouvement))
             .orElse(null);
     }
 } 
