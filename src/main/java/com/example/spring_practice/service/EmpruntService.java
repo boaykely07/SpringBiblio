@@ -19,6 +19,8 @@ import com.example.spring_practice.model.entities.LivreEntity;
 import com.example.spring_practice.model.entities.ProfilAdherentEntity;
 import com.example.spring_practice.repository.ProlongementRepository;
 import com.example.spring_practice.model.entities.ProlongementEntity;
+import com.example.spring_practice.repository.MvtProlongementRepository;
+import com.example.spring_practice.model.entities.MvtProlongementEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,8 @@ public class EmpruntService {
     private DroitsEmpruntSpecifiquesRepository droitsEmpruntSpecifiquesRepository;
     @Autowired
     private ProlongementRepository prolongementRepository;
+    @Autowired
+    private MvtProlongementRepository mvtProlongementRepository;
 
     public List<EmpruntEntity> findAll() {
         return empruntRepository.findAll();
@@ -163,7 +167,11 @@ public class EmpruntService {
         LocalDateTime datePrevue = emprunt.getDateRetourPrevue();
         ProlongementEntity prolongement = prolongementRepository.findTopByEmpruntIdOrderByDateFinDesc(empruntId);
         if (prolongement != null && prolongement.getDateFin() != null) {
-            datePrevue = prolongement.getDateFin();
+            MvtProlongementEntity dernierMvt = getLastMvtProlongement(prolongement.getId());
+            if (dernierMvt != null && "Valide".equalsIgnoreCase(dernierMvt.getStatutNouveau().getCodeStatut())) {
+                datePrevue = prolongement.getDateFin();
+            }
+            // Sinon, on garde la datePrevue d'origine (pas de prise en compte du prolongement)
         }
         StatutEmpruntEntity statut = statutEmpruntRepository.findByCodeStatut("Rendu")
             .orElseThrow(() -> new IllegalStateException("Statut 'Rendu' introuvable"));
@@ -179,5 +187,19 @@ public class EmpruntService {
         return mvtEmpruntRepository.findTopByEmpruntIdOrderByDateMouvementDesc(empruntId)
             .map(mvt -> mvt.getStatutNouveau().getCodeStatut())
             .orElse("Inconnu");
+    }
+
+    public java.util.List<EmpruntEntity> findByAdherentId(Long adherentId) {
+        return empruntRepository.findByAdherentId(adherentId);
+    }
+
+    /**
+     * Retourne le dernier mouvement pour un prolongement donné (ou null si aucun)
+     */
+    private MvtProlongementEntity getLastMvtProlongement(Long prolongementId) {
+        return mvtProlongementRepository.findAll().stream()
+            .filter(m -> m.getProlongement().getId().equals(prolongementId))
+            .max(java.util.Comparator.comparing(MvtProlongementEntity::getDateMouvement))
+            .orElse(null);
     }
 } 

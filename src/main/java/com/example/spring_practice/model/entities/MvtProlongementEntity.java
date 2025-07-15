@@ -31,4 +31,4 @@ public class MvtProlongementEntity {
     public void setStatutNouveau(StatutProlongementEntity statutNouveau) { this.statutNouveau = statutNouveau; }
     public LocalDateTime getDateMouvement() { return dateMouvement; }
     public void setDateMouvement(LocalDateTime dateMouvement) { this.dateMouvement = dateMouvement; }
-}
+} 

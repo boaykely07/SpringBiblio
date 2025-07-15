@@ -16,6 +16,9 @@ public class ProfilAdherentEntity {
     @Column(name = "quota_emprunts_simultanes", nullable = false)
     private int quotaEmpruntsSimultanes = 3;
 
+    @Column(name = "quota_penalites_jours", nullable = false)
+    private int quotaPenalitesJours = 7;
+
     // Getters et setters
     public Long getId() {
         return id;
@@ -39,5 +42,12 @@ public class ProfilAdherentEntity {
 
     public void setQuotaEmpruntsSimultanes(int quotaEmpruntsSimultanes) {
         this.quotaEmpruntsSimultanes = quotaEmpruntsSimultanes;
+    }
+
+    public int getQuotaPenalitesJours() {
+        return quotaPenalitesJours;
+    }
+    public void setQuotaPenalitesJours(int quotaPenalitesJours) {
+        this.quotaPenalitesJours = quotaPenalitesJours;
     }
 }

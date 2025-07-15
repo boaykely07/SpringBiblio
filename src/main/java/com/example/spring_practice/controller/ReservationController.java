@@ -92,8 +92,8 @@ public class ReservationController {
     public String validerReservation(@PathVariable Long id) {
         ReservationEntity reservation = reservationService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Réservation non trouvée"));
-        StatutReservationEntity statutValidee = statutReservationRepository.findByCodeStatut("Validée")
-            .orElseThrow(() -> new IllegalStateException("Statut 'Validée' introuvable"));
+        StatutReservationEntity statutValidee = statutReservationRepository.findByCodeStatut("Validee")
+            .orElseThrow(() -> new IllegalStateException("Statut 'Validee' introuvable"));
         MvtReservationEntity mvt = new MvtReservationEntity();
         mvt.setReservation(reservation);
         mvt.setStatutNouveau(statutValidee);
