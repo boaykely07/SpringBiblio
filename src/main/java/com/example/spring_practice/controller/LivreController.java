@@ -7,6 +7,7 @@ import com.example.spring_practice.model.entities.EditeurEntity;
 import com.example.spring_practice.repository.EditeurRepository;
 import com.example.spring_practice.repository.AuteurRepository;
 import com.example.spring_practice.repository.CategorieRepository;
+import com.example.spring_practice.repository.ExemplaireRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -36,6 +38,9 @@ public class LivreController {
 
     @Autowired
     private CategorieRepository categorieRepository;
+
+    @Autowired
+    private ExemplaireRepository exemplaireRepository;
 
     @GetMapping
     public String listLivres(Model model) {
@@ -62,8 +67,21 @@ public class LivreController {
     }
 
     @PostMapping
-    public String saveLivre(@ModelAttribute LivreEntity livre, Model model) {
-        livreService.save(livre);
+    public String saveLivre(@ModelAttribute LivreEntity livre, HttpServletRequest request, Model model) {
+        LivreEntity savedLivre = livreService.save(livre);
+        // Récupérer la quantité d'exemplaires depuis le formulaire
+        String quantiteStr = request.getParameter("quantiteExemplaires");
+        int quantite = 1;
+        try {
+            quantite = Integer.parseInt(quantiteStr);
+        } catch (Exception e) {
+            quantite = 1;
+        }
+        // Créer l'exemplaire associé
+        com.example.spring_practice.model.entities.ExemplaireEntity exemplaire = new com.example.spring_practice.model.entities.ExemplaireEntity();
+        exemplaire.setLivre(savedLivre);
+        exemplaire.setQuantite(quantite);
+        exemplaireRepository.save(exemplaire);
         return "redirect:/livres";
     }
 

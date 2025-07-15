@@ -90,7 +90,7 @@ public class ReservationService {
                 java.time.LocalDateTime dateResaDebut = reservation.getDateAReserver().atStartOfDay();
                 java.time.LocalDateTime dateResaFin = reservation.getDateAReserver().atTime(23,59,59);
                 boolean chevauche = !dateResaFin.isBefore(debutExist) && !dateResaDebut.isAfter(finExist);
-                if (("En cours".equalsIgnoreCase(statut) || "Retard".equalsIgnoreCase(statut)) && chevauche) {
+                if (("En cours".equalsIgnoreCase(statut)) && chevauche) {
                     disponible -= 1;
                 } else if ("Rendu".equalsIgnoreCase(statut) && chevauche) {
                     disponible += 1;

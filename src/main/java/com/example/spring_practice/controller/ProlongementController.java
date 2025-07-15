@@ -5,26 +5,20 @@ import com.example.spring_practice.model.entities.EmpruntEntity;
 import com.example.spring_practice.service.ProlongementService;
 import com.example.spring_practice.repository.EmpruntRepository;
 import com.example.spring_practice.service.EmpruntService;
+import com.example.spring_practice.repository.StatutProlongementRepository;
+import com.example.spring_practice.repository.MvtProlongementRepository;
+import com.example.spring_practice.repository.AdherentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.format.annotation.DateTimeFormat;
-import com.example.spring_practice.model.entities.MvtProlongementEntity;
-import com.example.spring_practice.model.entities.StatutProlongementEntity;
-import com.example.spring_practice.repository.MvtProlongementRepository;
-import com.example.spring_practice.repository.StatutProlongementRepository;
-import com.example.spring_practice.repository.AdherentRepository;
-import com.example.spring_practice.model.entities.AdherentEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/prolongements")
@@ -36,16 +30,25 @@ public class ProlongementController {
     @Autowired
     private EmpruntService empruntService;
     @Autowired
-    private MvtProlongementRepository mvtProlongementRepository;
-    @Autowired
     private StatutProlongementRepository statutProlongementRepository;
+    @Autowired
+    private MvtProlongementRepository mvtProlongementRepository;
     @Autowired
     private AdherentRepository adherentRepository;
 
     @GetMapping
     public String listProlongements(Model model) {
         List<ProlongementEntity> prolongements = prolongementService.findAll();
+        java.util.Map<Long, String> statutsProlongement = new java.util.HashMap<>();
+        for (ProlongementEntity p : prolongements) {
+            com.example.spring_practice.model.entities.MvtProlongementEntity mvt = mvtProlongementRepository.findAll().stream()
+                .filter(m -> m.getProlongement().getId().equals(p.getId()))
+                .max(java.util.Comparator.comparing(com.example.spring_practice.model.entities.MvtProlongementEntity::getDateMouvement))
+                .orElse(null);
+            statutsProlongement.put(p.getId(), mvt != null ? mvt.getStatutNouveau().getCodeStatut() : "Inconnu");
+        }
         model.addAttribute("prolongements", prolongements);
+        model.addAttribute("statutsProlongement", statutsProlongement);
         return "pages/admin/prolongement_list";
     }
 
@@ -108,133 +111,61 @@ public class ProlongementController {
         return "redirect:/prolongements";
     }
 
-    // Liste des prolongements du client connecté
-    @GetMapping("/client")
-    public String listProlongementsClient(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        AdherentEntity adherent = adherentRepository.findAll().stream()
-            .filter(a -> a.getUtilisateur() != null && email.equals(a.getUtilisateur().getEmail()))
-            .findFirst().orElse(null);
-        if (adherent == null) {
-            model.addAttribute("prolongements", List.of());
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_list";
-        }
-        List<ProlongementEntity> prolongements = prolongementService.findAll().stream()
-            .filter(p -> p.getEmprunt() != null && p.getEmprunt().getAdherent() != null &&
-                p.getEmprunt().getAdherent().getId().equals(adherent.getId()))
-            .toList();
-        // Pour chaque prolongement, on peut ajouter le statut courant (le dernier mouvement)
-        List<Map<String, Object>> prolongementsAvecStatut = prolongements.stream().map(p -> {
-            Map<String, Object> map = new java.util.HashMap<>();
-            map.put("id", p.getId());
-            map.put("emprunt", p.getEmprunt());
-            map.put("dateFin", p.getDateFin());
-            map.put("dateProlongement", p.getDateProlongement());
-            // Chercher le dernier mouvement
-            MvtProlongementEntity mvt = mvtProlongementRepository.findAll().stream()
-                .filter(m -> m.getProlongement().getId().equals(p.getId()))
-                .max(java.util.Comparator.comparing(MvtProlongementEntity::getDateMouvement))
-                .orElse(null);
-            map.put("statut", mvt != null ? mvt.getStatutNouveau().getCodeStatut() : "-");
-            return map;
-        }).toList();
-        model.addAttribute("prolongements", prolongementsAvecStatut);
-        model.addAttribute("activePage_client", "prolongements");
-        return "pages/client/prolongement_list";
-    }
-
-    // Formulaire d'ajout de prolongement (client)
+    // Affichage du formulaire de demande de prolongement côté client
     @GetMapping("/client/new")
-    public String newProlongementFormClient(Model model, HttpSession session) {
-        // Récupérer l'utilisateur connecté depuis la session
-        com.example.spring_practice.model.entities.UtilisateurEntity utilisateur = (com.example.spring_practice.model.entities.UtilisateurEntity) session.getAttribute("user");
-        if (utilisateur == null) {
-            model.addAttribute("prolongement", new ProlongementEntity());
-            model.addAttribute("emprunts", java.util.List.of());
-            model.addAttribute("activePage_client", "prolongements");
-            model.addAttribute("debugEmpruntsCount", 0);
-            return "pages/client/prolongement_form";
+    public String newProlongementClientForm(@RequestParam(required = false) Long livreId, @RequestParam(required = false) Long empruntId, Model model) {
+        // TODO: remplacer par l'adhérent connecté
+        com.example.spring_practice.model.entities.AdherentEntity adherent = adherentRepository.findAll().get(0);
+        java.util.List<com.example.spring_practice.model.entities.EmpruntEntity> emprunts;
+        if (empruntId != null) {
+            emprunts = java.util.List.of(empruntRepository.findById(empruntId).orElse(null));
+        } else if (livreId != null) {
+            emprunts = empruntRepository.findByAdherentId(adherent.getId()).stream()
+                .filter(e -> e.getExemplaire().getLivre().getId().equals(livreId) && e.getDateRetourReelle() == null)
+                .toList();
+        } else {
+            emprunts = empruntRepository.findByAdherentId(adherent.getId());
         }
-        AdherentEntity adherent = adherentRepository.findAll().stream()
-            .filter(a -> a.getUtilisateur() != null && a.getUtilisateur().getId().equals(utilisateur.getId()))
-            .findFirst().orElse(null);
-        System.out.println("[DEBUG] Utilisateur connecté id=" + utilisateur.getId() + ", email=" + utilisateur.getEmail());
-        System.out.println("[DEBUG] Adhérent trouvé : " + (adherent != null ? adherent.getNom() : "Aucun"));
-        List<EmpruntEntity> emprunts = prolongementService.getEmpruntsProlongeablesPourAdherent(adherent);
-        // Log et filtrage pour éviter les erreurs Thymeleaf
-        emprunts = emprunts.stream()
-            .filter(e -> {
-                if (e.getAdherent() == null) {
-                    System.out.println("[ERREUR] Emprunt #" + e.getId() + " n'a pas d'adhérent !");
-                    return false;
-                } else {
-                    System.out.println("[DEBUG] Emprunt #" + e.getId() + " - Adhérent : " + e.getAdherent().getNom() + " " + e.getAdherent().getPrenom());
-                    return true;
-                }
-            })
-            .toList();
-        model.addAttribute("prolongement", new ProlongementEntity());
+        model.addAttribute("prolongement", new com.example.spring_practice.model.entities.ProlongementEntity());
         model.addAttribute("emprunts", emprunts);
-        model.addAttribute("activePage_client", "prolongements");
-        model.addAttribute("debugEmpruntsCount", emprunts.size());
-        return "pages/client/prolongement_form";
+        model.addAttribute("clientMode", true);
+        return "pages/client/prolongement_form_client";
     }
 
-    // Traitement de la demande de prolongement (client)
+    // Traitement de la demande de prolongement côté client
     @PostMapping("/client/new")
-    public String saveProlongementClient(@ModelAttribute ProlongementEntity prolongement, Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        AdherentEntity adherent = adherentRepository.findAll().stream()
-            .filter(a -> a.getUtilisateur() != null && email.equals(a.getUtilisateur().getEmail()))
-            .findFirst().orElse(null);
-        if (adherent == null) {
-            model.addAttribute("error", "Utilisateur non trouvé.");
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_form";
+    public String saveProlongementClient(@ModelAttribute com.example.spring_practice.model.entities.ProlongementEntity prolongement, RedirectAttributes redirectAttributes, Model model) {
+        if (prolongement.getEmprunt() != null && prolongement.getEmprunt().getId() != null) {
+            prolongement.setEmprunt(
+                empruntRepository.findById(prolongement.getEmprunt().getId())
+                    .orElse(null)
+            );
         }
-        // Vérifier que l'emprunt appartient au client
-        if (prolongement.getEmprunt() == null || prolongement.getEmprunt().getId() == null) {
-            model.addAttribute("error", "Veuillez sélectionner un emprunt valide.");
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_form";
-        }
-        EmpruntEntity emprunt = empruntRepository.findById(prolongement.getEmprunt().getId()).orElse(null);
-        if (emprunt == null || emprunt.getAdherent() == null || !emprunt.getAdherent().getId().equals(adherent.getId())) {
-            model.addAttribute("error", "Emprunt non valide.");
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_form";
-        }
-        // Vérification des dates
-        if (prolongement.getDateFin() == null) {
-            model.addAttribute("error", "Veuillez choisir une nouvelle date de fin.");
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_form";
-        }
-        if (prolongement.getDateFin().isBefore(emprunt.getDateEmprunt())) {
-            model.addAttribute("error", "La nouvelle date de fin ne peut pas être avant la date d'emprunt.");
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_form";
-        }
-        if (!prolongement.getDateFin().isAfter(emprunt.getDateRetourPrevue())) {
-            model.addAttribute("error", "La nouvelle date de fin doit être postérieure à la date de fin actuelle de l'emprunt.");
-            model.addAttribute("activePage_client", "prolongements");
-            return "pages/client/prolongement_form";
-        }
-        prolongement.setEmprunt(emprunt);
         prolongement.setDateProlongement(java.time.LocalDateTime.now());
-        ProlongementEntity savedProlongement = prolongementService.save(prolongement);
-        // Créer le mouvement en statut 'En attente'
-        StatutProlongementEntity statutEnAttente = statutProlongementRepository.findByCodeStatut("En attente").orElse(null);
-        if (statutEnAttente != null) {
-            MvtProlongementEntity mvt = new MvtProlongementEntity();
-            mvt.setProlongement(savedProlongement);
-            mvt.setStatutNouveau(statutEnAttente);
-            mvt.setDateMouvement(java.time.LocalDateTime.now());
-            mvtProlongementRepository.save(mvt);
-        }
-        return "redirect:/prolongements/client";
+        prolongementService.save(prolongement);
+        com.example.spring_practice.model.entities.StatutProlongementEntity statutEnAttente = statutProlongementRepository.findByCodeStatut("En attente")
+            .orElseThrow(() -> new IllegalStateException("Statut 'En attente' introuvable"));
+        com.example.spring_practice.model.entities.MvtProlongementEntity mvt = new com.example.spring_practice.model.entities.MvtProlongementEntity();
+        mvt.setProlongement(prolongement);
+        mvt.setStatutNouveau(statutEnAttente);
+        mvt.setDateMouvement(java.time.LocalDateTime.now());
+        mvtProlongementRepository.save(mvt);
+        redirectAttributes.addAttribute("success", "Demande de prolongement envoyée.");
+        return "redirect:/emprunts/mes-emprunts";
+    }
+
+    // Action pour valider un prolongement
+    @PostMapping("/valider/{id}")
+    public String validerProlongement(@PathVariable Long id) {
+        ProlongementEntity prolongement = prolongementService.findById(id).orElse(null);
+        if (prolongement == null) return "redirect:/prolongements";
+        com.example.spring_practice.model.entities.StatutProlongementEntity statutValide = statutProlongementRepository.findByCodeStatut("Valide")
+            .orElseThrow(() -> new IllegalStateException("Statut 'Valide' introuvable"));
+        com.example.spring_practice.model.entities.MvtProlongementEntity mvt = new com.example.spring_practice.model.entities.MvtProlongementEntity();
+        mvt.setProlongement(prolongement);
+        mvt.setStatutNouveau(statutValide);
+        mvt.setDateMouvement(java.time.LocalDateTime.now());
+        mvtProlongementRepository.save(mvt);
+        return "redirect:/prolongements";
     }
 }

@@ -129,11 +129,27 @@ abonnement
 penalites
 quantites exemplaire
 quota
+Azo indraminy age profil
+azo entina mody
 
 Abonemment:
 raha efa manana de amin'iny volana iny de tsy afaka manatsofoka tsony
 
 Prolongement:
 date fin prolongement > date fin emprunt
+raha efa nisy reserver de tsy afaka prolongena
+excepiton abonnement
+
+Profil specifique:
+Exception age 
+exception afaka oentina mody
+
+reservation:
+abonnement
+penalites
+
+netstat -ano | findstr :8080
+taskkill /PID 12345 /F
+
 
 

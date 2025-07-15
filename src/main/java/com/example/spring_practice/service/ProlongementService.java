@@ -4,11 +4,10 @@ import com.example.spring_practice.model.entities.ProlongementEntity;
 import com.example.spring_practice.repository.ProlongementRepository;
 import com.example.spring_practice.repository.AbonnementRepository;
 import com.example.spring_practice.model.entities.AbonnementEntity;
+import com.example.spring_practice.repository.PenaliteRepository;
+import com.example.spring_practice.model.entities.PenaliteEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.spring_practice.model.entities.EmpruntEntity;
-import com.example.spring_practice.repository.EmpruntRepository;
-import com.example.spring_practice.service.EmpruntService;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +21,7 @@ public class ProlongementService {
     private AbonnementRepository abonnementRepository;
 
     @Autowired
-    private EmpruntRepository empruntRepository;
-
-    @Autowired
-    private EmpruntService empruntService;
+    private PenaliteRepository penaliteRepository;
 
     public List<ProlongementEntity> findAll() {
         return prolongementRepository.findAll();
@@ -48,47 +44,20 @@ public class ProlongementService {
             if (!actif) {
                 throw new IllegalStateException("L'adhérent n'a pas d'abonnement actif à la nouvelle date de fin du prolongement.");
             }
+            // Vérification de l'absence de pénalité couvrant la date de fin du prolongement
+            java.util.List<PenaliteEntity> penalites = penaliteRepository.findByAdherentId(adherentId);
+            for (PenaliteEntity p : penalites) {
+                java.time.LocalDate debut = p.getDateDebut();
+                java.time.LocalDate fin = debut.plusDays(p.getJour() - 1);
+                if ((dateFin.isEqual(debut) || dateFin.isAfter(debut)) && dateFin.isBefore(fin.plusDays(1))) {
+                    throw new IllegalStateException("Impossible de prolonger : la date de fin du prolongement est couverte par une pénalité.");
+                }
+            }
         }
         return prolongementRepository.save(prolongement);
     }
 
     public void deleteById(Long id) {
         prolongementRepository.deleteById(id);
-    }
-
-    public List<EmpruntEntity> getEmpruntsProlongeablesPourAdherent(com.example.spring_practice.model.entities.AdherentEntity adherent) {
-        if (adherent == null) {
-            System.out.println("[DEBUG] Adhérent null dans getEmpruntsProlongeablesPourAdherent");
-            return List.of();
-        }
-        List<EmpruntEntity> emprunts = empruntRepository.findByAdherentId(adherent.getId());
-        System.out.println("[DEBUG] Emprunts trouvés pour l'adhérent " + adherent.getNom() + " (id=" + adherent.getId() + ") : " + emprunts.size());
-        for (EmpruntEntity e : emprunts) {
-            String statut = empruntService.getLastStatutForEmprunt(e.getId());
-            System.out.println("[DEBUG] Emprunt #" + e.getId() + " statut: " + statut);
-        }
-        return emprunts.stream()
-            .filter(e -> {
-                String statut = empruntService.getLastStatutForEmprunt(e.getId());
-                boolean enCours = "En cours".equalsIgnoreCase(statut);
-                if (!enCours) {
-                    System.out.println("[DEBUG] Emprunt #" + e.getId() + " ignoré car statut: " + statut);
-                }
-                return enCours;
-            })
-            .filter(e -> {
-                List<ProlongementEntity> prolongements = findAll().stream()
-                    .filter(p -> p.getEmprunt() != null && p.getEmprunt().getId().equals(e.getId()))
-                    .toList();
-                if (prolongements.isEmpty()) {
-                    System.out.println("[DEBUG] Emprunt #" + e.getId() + " prolongeable (aucun prolongement)");
-                    return true;
-                }
-                java.time.LocalDateTime maxProlong = prolongements.stream().map(ProlongementEntity::getDateFin).max(java.time.LocalDateTime::compareTo).orElse(null);
-                boolean prolongeable = maxProlong == null || maxProlong.isBefore(e.getDateRetourPrevue());
-                System.out.println("[DEBUG] Emprunt #" + e.getId() + " maxProlong=" + maxProlong + ", dateRetourPrevue=" + e.getDateRetourPrevue() + ", prolongeable=" + prolongeable);
-                return prolongeable;
-            })
-            .toList();
     }
 } 
