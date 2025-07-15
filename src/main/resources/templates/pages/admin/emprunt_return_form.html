@@ -60,7 +60,12 @@
                                 <input type="text" id="raison" name="raison"
                                     class="form-input w-full border rounded p-2" th:value="*{raison}">
                             </div>
-                            <input type="hidden" id="jour" name="jour" th:value="*{jour}">
+                            <div>
+                                <label for="jour" class="block font-medium mb-1 text-custom-dark">Nombre de
+                                    jours</label>
+                                <input type="number" id="jour" name="jour" class="form-input w-full border rounded p-2"
+                                    required min="1" th:value="*{jour}">
+                            </div>
                             <div class="flex items-center space-x-4 mt-4">
                                 <button type="submit"
                                     class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Valider

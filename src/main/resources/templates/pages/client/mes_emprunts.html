@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes emprunts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar_client :: sidebar_client}"></div>
+        <div class="flex-1">
+            <div th:replace="~{fragments/sidebar_client :: header_client}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Mes emprunts</h2>
+                <div th:if="${success}"
+                    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"
+                    th:text="${success}"></div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead>
+                            <tr class="bg-custom-medium text-custom-darker">
+                                <th class="py-2 px-4">ID</th>
+                                <th class="py-2 px-4">Livre</th>
+                                <th class="py-2 px-4">Date emprunt</th>
+                                <th class="py-2 px-4">Date retour prévue</th>
+                                <th class="py-2 px-4">Date retour réelle</th>
+                                <th class="py-2 px-4">Statut</th>
+                                <th class="py-2 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="emprunt : ${emprunts}" class="border-b hover:bg-custom-light">
+                                <td class="py-2 px-4" th:text="${emprunt.id}"></td>
+                                <td class="py-2 px-4" th:text="${emprunt.exemplaire.livre.titre}"></td>
+                                <td class="py-2 px-4"
+                                    th:text="${#temporals.format(emprunt.dateEmprunt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td class="py-2 px-4"
+                                    th:text="${#temporals.format(emprunt.dateRetourPrevue, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td class="py-2 px-4"
+                                    th:text="${emprunt.dateRetourReelle != null ? #temporals.format(emprunt.dateRetourReelle, 'dd/MM/yyyy HH:mm') : '-'}">
+                                </td>
+                                <td class="py-2 px-4" th:text="${statuts[emprunt.id]}"></td>
+                                <td class="py-2 px-4">
+                                    <a th:if="${statuts[emprunt.id]} == 'En cours'"
+                                        th:href="@{'/prolongements/client/new?empruntId=' + ${emprunt.id}}"
+                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-800 transition">Prolonger</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(emprunts)}">
+                                <td colspan="7" class="text-center py-4 text-gray-500">Aucun emprunt trouvé.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>

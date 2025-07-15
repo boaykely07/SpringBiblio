@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des profils adhérents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6">
+                <h2 class="text-2xl font-bold mb-6">Liste des profils adhérents</h2>
+                <a href="/profils-adherent/new"
+                    class="mb-4 inline-block bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Ajouter
+                    un profil adhérent</a>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead>
+                            <tr class="bg-custom-medium text-custom-darker">
+                                <th class="py-2 px-4">ID</th>
+                                <th class="py-2 px-4">Nom du profil</th>
+                                <th class="py-2 px-4">Quota d'emprunts simultanés</th>
+                                <th class="py-2 px-4">Quota pénalités (jours)</th>
+                                <th class="py-2 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="profil : ${profils}" class="border-b hover:bg-custom-light">
+                                <td class="py-2 px-4" th:text="${profil.id}"></td>
+                                <td class="py-2 px-4" th:text="${profil.nomProfil}"></td>
+                                <td class="py-2 px-4" th:text="${profil.quotaEmpruntsSimultanes}"></td>
+                                <td class="py-2 px-4" th:text="${profil.quotaPenalitesJours}"></td>
+                                <td class="py-2 px-4">
+                                    <a th:href="@{'/profils-adherent/edit/' + ${profil.id}}"
+                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-800 transition">Modifier</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(profils)}">
+                                <td colspan="5" class="text-center py-4 text-gray-500">Aucun profil adhérent trouvé.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>
