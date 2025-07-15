@@ -1,6 +1,6 @@
 -- Insertion de profils d'adhérent exemples
 INSERT INTO Profils_Adherent (nom_profil, quota_emprunts_simultanes, quota_penalites_jours) VALUES
-  ('Etudiant', 2, 10),
+  ('Etudiant', 3, 10),
   ('Professeur', 2, 5),
   ('Public', 5, 7);
 
@@ -31,11 +31,16 @@ INSERT INTO Livres (titre, isbn, annee_publication, resume, id_editeur, id_auteu
   ('Germinal', '9782070413117', 1885, 'Roman d Emile Zola sur le monde ouvrier.', 2, 2),
   ('Harry Potter a l ecole des sorciers', '9782070643026', 1997, 'Premier tome de la saga Harry Potter.', 3, 3);
 
--- Insertion d'exemplaires
-INSERT INTO Exemplaires (id_livre, quantite) VALUES
-  (1, 3),
-  (2, 2),
-  (3, 5);
+-- Insertion d'exemplaires (3 exemplaires pour chaque livre)
+INSERT INTO Exemplaires (id_livre) VALUES (1);
+INSERT INTO Exemplaires (id_livre) VALUES (1);
+INSERT INTO Exemplaires (id_livre) VALUES (1);
+INSERT INTO Exemplaires (id_livre) VALUES (2);
+INSERT INTO Exemplaires (id_livre) VALUES (2);
+INSERT INTO Exemplaires (id_livre) VALUES (2);
+INSERT INTO Exemplaires (id_livre) VALUES (3);
+INSERT INTO Exemplaires (id_livre) VALUES (3);
+INSERT INTO Exemplaires (id_livre) VALUES (3);
 
 -- Insertion de droits d'emprunt spécifiques
 INSERT INTO Droits_Emprunt_Specifiques (id_livre, id_profil, age, emprunt_surplace_autorise, emprunt_domicile_autorise) VALUES

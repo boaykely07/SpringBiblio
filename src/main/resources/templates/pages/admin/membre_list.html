@@ -25,6 +25,7 @@
                                 <th class="py-2 px-4">ID</th>
                                 <th class="py-2 px-4">Nom</th>
                                 <th class="py-2 px-4">Email</th>
+                                <th class="py-2 px-4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -32,6 +33,11 @@
                                 <td class="py-2 px-4" th:text="${membre.id}"></td>
                                 <td class="py-2 px-4" th:text="${membre.nom}"></td>
                                 <td class="py-2 px-4" th:text="${membre.utilisateur.email}"></td>
+                                <td class="py-2 px-4">
+                                    <button type="button"
+                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-800 transition voir-details-membre-btn"
+                                        th:data-id="${membre.id}">Voir détails</button>
+                                </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(membres)}">
                                 <td colspan="3" class="text-center py-4 text-gray-500">Aucun membre trouvé.</td>
@@ -44,6 +50,77 @@
     </div>
     <script th:src="@{/js/main.js}"></script>
     <script th:src="@{/js/config_tailwind.js}"></script>
+    <!-- Modal pour afficher les détails du membre -->
+    <div id="modal-details-membre"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+            <button id="close-modal-membre"
+                class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">&times;</button>
+            <h3 class="text-xl font-bold mb-4">Détails du membre</h3>
+            <div id="modal-content-details-membre">
+                <!-- Les détails seront injectés ici -->
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.voir-details-membre-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                fetch(`/membres/api/${id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let html = '';
+                        if (data.error) {
+                            html = `<div class='text-red-600'>${data.error}</div>`;
+                        } else {
+                            html = `<ul class='space-y-2'>
+                                <li><b>ID :</b> ${data.id}</li>
+                                <li><b>Nom :</b> ${data.nom}</li>
+                                <li><b>Prénom :</b> ${data.prenom}</li>
+                                <li><b>Date de naissance :</b> ${data.dateNaissance || '-'} </li>`;
+                            if (data.profilAdherent) {
+                                html += `<li><b>Profil :</b> ${data.profilAdherent.nomProfil} (Quota emprunts : ${data.profilAdherent.quotaEmpruntsSimultanes}, Quota pénalités : ${data.profilAdherent.quotaPenalitesJours})</li>`;
+                            }
+                            html += `<li><b>Quota restant :</b> ${data.quotaRestant}</li>`;
+                            // Ajout de l'info pénalité en cours ou non
+                            if (data.penaliteEnCours) {
+                                html += `<li class='text-red-600 font-bold'>A une pénalité en cours</li>`;
+                            } else {
+                                html += `<li class='text-green-700 font-bold'>Pas de pénalité en cours</li>`;
+                            }
+                            if (data.abonnements && data.abonnements.length > 0) {
+                                html += `<li><b>Abonnements :</b><ul class='ml-4 list-disc'>`;
+                                data.abonnements.forEach(ab => {
+                                    html += `<li>Du ${ab.dateDebut} au ${ab.dateFin}</li>`;
+                                });
+                                html += `</ul></li>`;
+                            }
+                            if (data.penaliteEnCours) {
+                                html += `<li class='text-red-600'><b>Pénalité en cours :</b> du ${data.penaliteEnCours.dateDebut} au ${data.penaliteEnCours.dateFin} (${data.penaliteEnCours.raison})</li>`;
+                            }
+                            if (data.penalites && data.penalites.length > 0) {
+                                html += `<li><b>Historique des pénalités :</b><ul class='ml-4 list-disc'>`;
+                                data.penalites.forEach(p => {
+                                    html += `<li>Du ${p.dateDebut} au ${p.dateFin} (${p.raison})</li>`;
+                                });
+                                html += `</ul></li>`;
+                            }
+                            html += `</ul>`;
+                        }
+                        document.getElementById('modal-content-details-membre').innerHTML = html;
+                        document.getElementById('modal-details-membre').classList.remove('hidden');
+                    });
+            });
+        });
+        document.getElementById('close-modal-membre').addEventListener('click', function () {
+            document.getElementById('modal-details-membre').classList.add('hidden');
+        });
+        document.getElementById('modal-details-membre').addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>

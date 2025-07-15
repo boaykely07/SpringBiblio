@@ -153,3 +153,6 @@ taskkill /PID 12345 /F
 
 
 
+Update exemplaire:
+table exemplaire delete quantite
+Miinsert exemplaire boucle

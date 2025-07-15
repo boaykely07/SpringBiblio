@@ -8,6 +8,10 @@ import com.example.spring_practice.repository.EditeurRepository;
 import com.example.spring_practice.repository.AuteurRepository;
 import com.example.spring_practice.repository.CategorieRepository;
 import com.example.spring_practice.repository.ExemplaireRepository;
+import com.example.spring_practice.model.entities.ExemplaireEntity;
+import com.example.spring_practice.model.entities.EmpruntEntity;
+import com.example.spring_practice.model.entities.AdherentEntity;
+import com.example.spring_practice.model.entities.ProlongementEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,12 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.ResponseBody;
-import java.util.stream.Collectors;
-import java.util.Map;
-import java.util.HashMap;
-
-import java.util.List;
-import com.example.spring_practice.service.EmpruntService;
+import java.util.*;
+import com.example.spring_practice.repository.EmpruntRepository;
 
 @Controller
 @RequestMapping("/livres")
@@ -48,7 +48,7 @@ public class LivreController {
     private ExemplaireRepository exemplaireRepository;
 
     @Autowired
-    private EmpruntService empruntService;
+    private EmpruntRepository empruntRepository;
 
     @GetMapping
     public String listLivres(Model model) {
@@ -75,21 +75,13 @@ public class LivreController {
     }
 
     @PostMapping
-    public String saveLivre(@ModelAttribute LivreEntity livre, HttpServletRequest request, Model model) {
+    public String saveLivre(@ModelAttribute LivreEntity livre, HttpServletRequest request, Model model, @RequestParam("quantiteExemplaires") int quantiteExemplaires) {
         LivreEntity savedLivre = livreService.save(livre);
-        // Récupérer la quantité d'exemplaires depuis le formulaire
-        String quantiteStr = request.getParameter("quantiteExemplaires");
-        int quantite = 1;
-        try {
-            quantite = Integer.parseInt(quantiteStr);
-        } catch (Exception e) {
-            quantite = 1;
+        for (int i = 0; i < quantiteExemplaires; i++) {
+            ExemplaireEntity exemplaire = new ExemplaireEntity();
+            exemplaire.setLivre(savedLivre);
+            exemplaireRepository.save(exemplaire);
         }
-        // Créer l'exemplaire associé
-        com.example.spring_practice.model.entities.ExemplaireEntity exemplaire = new com.example.spring_practice.model.entities.ExemplaireEntity();
-        exemplaire.setLivre(savedLivre);
-        exemplaire.setQuantite(quantite);
-        exemplaireRepository.save(exemplaire);
         return "redirect:/livres";
     }
 
@@ -107,81 +99,38 @@ public class LivreController {
         return "pages/client/livre_list";
     }
 
-    @GetMapping("/{id}/exemplaires-json")
+    @GetMapping("/api/{id}")
     @ResponseBody
-    public List<Map<String, Object>> getExemplairesJson(@PathVariable Long id) {
-        List<com.example.spring_practice.model.entities.ExemplaireEntity> exemplaires = exemplaireRepository.findByLivreId(id);
-        List<Map<String, Object>> result = new java.util.ArrayList<>();
-        for (com.example.spring_practice.model.entities.ExemplaireEntity ex : exemplaires) {
-            com.example.spring_practice.model.entities.LivreEntity livre = ex.getLivre();
-            Map<String, Object> map = new HashMap<>();
-            map.put("id_exemplaire", ex.getId());
-            map.put("id_livre", livre.getId());
-            map.put("titre", livre.getTitre());
-            map.put("isbn", livre.getIsbn());
-            map.put("annee_publication", livre.getAnneePublication());
-            map.put("resume", livre.getResume());
-            // Auteur
-            if (livre.getAuteur() != null) {
-                Map<String, Object> auteur = new HashMap<>();
-                auteur.put("id_auteur", livre.getAuteur().getId());
-                auteur.put("nom", livre.getAuteur().getNom());
-                auteur.put("prenom", livre.getAuteur().getPrenom());
-                map.put("auteur", auteur);
-            } else {
-                map.put("auteur", null);
-            }
-            // Editeur
-            if (livre.getEditeur() != null) {
-                Map<String, Object> editeur = new HashMap<>();
-                editeur.put("id_editeur", livre.getEditeur().getId());
-                editeur.put("nom", livre.getEditeur().getNom());
-                map.put("editeur", editeur);
-            } else {
-                map.put("editeur", null);
-            }
-            // Categories
-            if (livre.getCategories() != null) {
-                List<Map<String, Object>> categories = livre.getCategories().stream().map(cat -> {
-                    Map<String, Object> catMap = new HashMap<>();
-                    catMap.put("id_categorie", cat.getId());
-                    catMap.put("nom", cat.getNom());
-                    return catMap;
-                }).collect(Collectors.toList());
-                map.put("categories", categories);
-            } else {
-                map.put("categories", null);
-            }
-            // Etat de chaque exemplaire physique
-            int quantite = ex.getQuantite();
-            List<com.example.spring_practice.model.entities.EmpruntEntity> emprunts = empruntService.findAll().stream()
-                .filter(emp -> emp.getExemplaire().getId().equals(ex.getId()))
-                .collect(Collectors.toList());
-            // On considère qu'il y a quantite exemplaires physiques, on va marquer les premiers N comme non disponibles si il y a N emprunts "En cours"
-            int nbEmpruntsEnCours = (int) emprunts.stream()
-                .filter(emp -> "En cours".equalsIgnoreCase(empruntService.getLastStatutForEmprunt(emp.getId())))
-                .count();
-            List<Map<String, Object>> exemplairesPhysiques = new java.util.ArrayList<>();
-            for (int i = 1; i <= quantite; i++) {
-                Map<String, Object> etat = new HashMap<>();
-                etat.put("numero_exemplaire", i);
-                etat.put("disponible", i > nbEmpruntsEnCours);
-                exemplairesPhysiques.add(etat);
-            }
-            map.put("exemplaires_physiques", exemplairesPhysiques);
-            // Debug : liste des emprunts et leur statut
-            List<Map<String, Object>> empruntsDebug = emprunts.stream().map(emp -> {
-                Map<String, Object> empMap = new HashMap<>();
-                empMap.put("id_emprunt", emp.getId());
-                empMap.put("date_emprunt", emp.getDateEmprunt());
-                empMap.put("date_retour_prevue", emp.getDateRetourPrevue());
-                empMap.put("date_retour_reelle", emp.getDateRetourReelle());
-                empMap.put("statut", empruntService.getLastStatutForEmprunt(emp.getId()));
-                return empMap;
-            }).collect(Collectors.toList());
-            map.put("emprunts_debug", empruntsDebug);
-            result.add(map);
+    public Map<String, Object> getLivreDetailsApi(@PathVariable Long id) {
+        LivreEntity livre = livreService.findById(id);
+        Map<String, Object> result = new HashMap<>();
+        if (livre == null) {
+            result.put("error", "Livre introuvable");
+            return result;
         }
+        result.put("id", livre.getId());
+        result.put("titre", livre.getTitre());
+        result.put("isbn", livre.getIsbn());
+        result.put("anneePublication", livre.getAnneePublication());
+        result.put("editeur", livre.getEditeur() != null ? livre.getEditeur().getNom() : null);
+        result.put("auteur", livre.getAuteur() != null ? livre.getAuteur().getNom() + " " + livre.getAuteur().getPrenom() : null);
+        // Chaque exemplaire physique est une ligne
+        List<Map<String, Object>> exemplairesList = new ArrayList<>();
+        int nbExemplaires = 0;
+        for (ExemplaireEntity ex : exemplaireRepository.findAll()) {
+            if (ex.getLivre().getId().equals(livre.getId())) {
+                nbExemplaires++;
+                List<EmpruntEntity> emprunts = empruntRepository.findByExemplaireId(ex.getId());
+                boolean disponible = emprunts.stream().noneMatch(emp -> emp.getDateRetourReelle() == null);
+                Map<String, Object> exMap = new HashMap<>();
+                exMap.put("id", ex.getId());
+                exMap.put("disponible", disponible);
+                exMap.put("label", "Exemplaire " + nbExemplaires);
+                exemplairesList.add(exMap);
+            }
+        }
+        result.put("nbExemplaires", nbExemplaires);
+        result.put("exemplaires", exemplairesList);
         return result;
     }
 } 

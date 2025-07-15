@@ -17,9 +17,8 @@ import com.example.spring_practice.model.entities.AbonnementEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.time.*;
 
 @Service
 public class ReservationService {
@@ -57,16 +56,16 @@ public class ReservationService {
         Long adherentId = reservation.getAdherent().getId();
         List<PenaliteEntity> penalites = penaliteRepository.findByAdherentId(adherentId);
         for (PenaliteEntity p : penalites) {
-            java.time.LocalDate debut = p.getDateDebut();
-            java.time.LocalDate fin = debut.plusDays(p.getJour() - 1);
-            java.time.LocalDate dateResa = reservation.getDateAReserver();
+            LocalDate debut = p.getDateDebut();
+            LocalDate fin = debut.plusDays(p.getJour() - 1);
+            LocalDate dateResa = reservation.getDateAReserver();
             if ((dateResa.isEqual(debut) || dateResa.isAfter(debut)) && dateResa.isBefore(fin.plusDays(1))) {
                 throw new IllegalStateException("L'adhérent a une pénalité couvrant la date de réservation et ne peut pas réserver.");
             }
         }
         // Vérification de l'abonnement actif à la date de réservation
         List<AbonnementEntity> abonnements = abonnementRepository.findByAdherentId(adherentId);
-        java.time.LocalDate dateResa = reservation.getDateAReserver();
+        LocalDate dateResa = reservation.getDateAReserver();
         boolean actif = abonnements.stream().anyMatch(ab ->
             (dateResa.isEqual(ab.getDateDebut()) || dateResa.isAfter(ab.getDateDebut())) &&
             (dateResa.isEqual(ab.getDateFin()) || dateResa.isBefore(ab.getDateFin()))
@@ -77,24 +76,26 @@ public class ReservationService {
         // Vérification de la disponibilité d'exemplaires pour la date de réservation
         Long livreId = reservation.getLivre().getId();
         List<ExemplaireEntity> exemplaires = exemplaireRepository.findByLivreId(livreId);
-        int total = exemplaires.stream().mapToInt(ExemplaireEntity::getQuantite).sum();
-        int disponible = total;
+        int disponible = 0;
         for (ExemplaireEntity ex : exemplaires) {
             List<EmpruntEntity> empruntsEx = empruntService.findAll().stream()
                 .filter(e -> e.getExemplaire().getId().equals(ex.getId()))
                 .toList();
+            boolean occupe = false;
             for (EmpruntEntity e : empruntsEx) {
                 String statut = empruntService.getLastStatutForEmprunt(e.getId());
-                java.time.LocalDateTime debutExist = e.getDateEmprunt();
-                java.time.LocalDateTime finExist = e.getDateRetourPrevue();
-                java.time.LocalDateTime dateResaDebut = reservation.getDateAReserver().atStartOfDay();
-                java.time.LocalDateTime dateResaFin = reservation.getDateAReserver().atTime(23,59,59);
+                LocalDateTime debutExist = e.getDateEmprunt();
+                LocalDateTime finExist = e.getDateRetourPrevue();
+                LocalDateTime dateResaDebut = reservation.getDateAReserver().atStartOfDay();
+                LocalDateTime dateResaFin = reservation.getDateAReserver().atTime(23,59,59);
                 boolean chevauche = !dateResaFin.isBefore(debutExist) && !dateResaDebut.isAfter(finExist);
-                if (("En cours".equalsIgnoreCase(statut)) && chevauche) {
-                    disponible -= 1;
-                } else if ("Rendu".equalsIgnoreCase(statut) && chevauche) {
-                    disponible += 1;
+                if ("En cours".equalsIgnoreCase(statut) && chevauche) {
+                    occupe = true;
+                    break;
                 }
+            }
+            if (!occupe) {
+                disponible++;
             }
         }
         if (disponible <= 0) {

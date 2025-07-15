@@ -24,12 +24,11 @@
                 <form th:action="@{/emprunts}" th:object="${emprunt}" method="post"
                     class="space-y-4 bg-white rounded-xl shadow-md p-6 border-l-4 border-custom-dark max-w-xl">
                     <div>
-                        <label for="exemplaire" class="block font-medium mb-1 text-custom-dark">Exemplaire</label>
-                        <select id="exemplaire" name="exemplaire.id" class="form-select w-full border rounded p-2"
-                            required>
-                            <option th:each="ex : ${exemplaires}" th:value="${ex.id}"
-                                th:text="|${ex.livre.titre} (ID: ${ex.id})|">Exemplaire</option>
+                        <label for="livre" class="block font-medium mb-1 text-custom-dark">Livre</label>
+                        <select id="livre" name="livre.id" class="form-select w-full border rounded p-2" required>
+                            <option th:each="liv : ${livres}" th:value="${liv.id}" th:text="${liv.titre}">Livre</option>
                         </select>
+                        <div id="dispo-livre" class="mt-2 text-sm text-custom-dark"></div>
                     </div>
                     <div>
                         <label for="adherent" class="block font-medium mb-1 text-custom-dark">Adhérent</label>
@@ -73,6 +72,27 @@
     </div>
     <script th:src="@{/js/main.js}"></script>
     <script th:src="@{/js/config_tailwind.js}"></script>
+    <script>
+        // Affichage dynamique du nombre d'exemplaires disponibles
+        const selectLivre = document.getElementById('livre');
+        const dispoDiv = document.getElementById('dispo-livre');
+        function updateDispo() {
+            const id = selectLivre.value;
+            if (!id) { dispoDiv.textContent = ''; return; }
+            fetch(`/livres/api/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.nbExemplaires !== undefined && data.exemplaires) {
+                        const dispo = data.exemplaires.filter(ex => ex.disponible).length;
+                        dispoDiv.innerHTML = `<b>Exemplaires disponibles :</b> <span class='${dispo > 0 ? 'text-green-600' : 'text-red-600'}'>${dispo}</span>`;
+                    } else {
+                        dispoDiv.textContent = 'Erreur lors de la récupération.';
+                    }
+                });
+        }
+        selectLivre.addEventListener('change', updateDispo);
+        window.addEventListener('DOMContentLoaded', updateDispo);
+    </script>
 </body>
 
 </html>
