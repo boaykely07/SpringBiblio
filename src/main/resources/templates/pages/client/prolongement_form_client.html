@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de prolongement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar_client :: sidebar_client}"></div>
+        <div class="flex-1">
+            <div th:replace="~{fragments/sidebar_client :: header_client}"></div>
+            <main class="p-6 max-w-xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Demande de prolongement</h2>
+                <form th:action="@{/prolongements/client/new}" th:object="${prolongement}" method="post"
+                    class="bg-white rounded-xl shadow-md p-6">
+                    <div th:if="${emprunts.size() > 1}">
+                        <label for="emprunt" class="block font-medium mb-2 text-custom-dark">Emprunt à prolonger</label>
+                        <select id="emprunt" name="emprunt.id" class="form-select w-full border rounded p-2" required>
+                            <option th:each="emp : ${emprunts}" th:value="${emp.id}"
+                                th:text="|Emprunt #${emp.id} - ${emp.exemplaire.livre.titre}|">Emprunt</option>
+                        </select>
+                    </div>
+                    <div th:if="${emprunts.size() == 1}">
+                        <input type="hidden" name="emprunt.id" th:value="${emprunts[0].id}" />
+                        <div class="mb-2">Livre : <span th:text="${emprunts[0].exemplaire.livre.titre}"></span></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="dateFin" class="block font-medium mb-2 text-custom-dark">Nouvelle date de fin
+                            souhaitée</label>
+                        <input type="datetime-local" id="dateFin" name="dateFin"
+                            class="form-input w-full border rounded p-2" required th:field="*{dateFin}">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <button type="submit"
+                            class="bg-custom-dark text-white px-6 py-2 rounded hover:bg-custom-darker transition">Envoyer
+                            la demande</button>
+                        <a th:href="@{/mes-emprunts}" class="mt-4 text-gray-500 hover:underline">Annuler</a>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>

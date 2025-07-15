@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription d'un membre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body class="bg-gradient-to-br from-custom-light to-custom-medium min-h-screen font-sans">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="content">
+        <div class="ml-5 flex-1">
+            <div th:replace="~{fragments/sidebar :: header}"></div>
+            <main class="p-6 max-w-lg mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Inscrire un nouveau membre</h2>
+                <form th:action="@{/membres}" th:object="${membreForm}" method="post"
+                    class="bg-white p-6 rounded-xl shadow-md space-y-4">
+                    <div th:if="${error}" class="text-red-600 text-sm mb-2" th:text="${error}"></div>
+                    <div>
+                        <label class="block mb-1 font-semibold">Nom</label>
+                        <input type="text" th:field="*{nom}" class="w-full border rounded px-3 py-2" required />
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold">Prénom</label>
+                        <input type="text" th:field="*{prenom}" class="w-full border rounded px-3 py-2" required />
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold">Date de naissance</label>
+                        <input type="date" th:field="*{dateNaissance}" class="w-full border rounded px-3 py-2"
+                            required />
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold">Email</label>
+                        <input type="email" th:field="*{email}" class="w-full border rounded px-3 py-2" required />
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold">Mot de passe</label>
+                        <input type="password" th:field="*{motDePasse}" class="w-full border rounded px-3 py-2"
+                            required />
+                    </div>
+                    <div>
+                        <button type="submit"
+                            class="bg-custom-dark text-white px-4 py-2 rounded hover:bg-custom-darker transition">Inscrire</button>
+                        <a href="/membres" class="ml-4 text-custom-dark hover:underline">Annuler</a>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/config_tailwind.js}"></script>
+</body>
+
+</html>
