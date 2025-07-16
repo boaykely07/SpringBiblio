@@ -1,8 +1,3 @@
-DROP DATABASE bibliotheque;
-CREATE DATABASE bibliotheque;
-
-\c bibliotheque;
-
 CREATE TABLE Profils_Adherent (
     id_profil SERIAL PRIMARY KEY,
     nom_profil VARCHAR(100) NOT NULL UNIQUE,
@@ -208,5 +203,3 @@ CREATE TABLE Mvt_Prolongement (
     FOREIGN KEY (id_prolongement) REFERENCES Prolongements(id_prolongement) ON DELETE CASCADE,
     FOREIGN KEY (id_statut_nouveau) REFERENCES Statuts_Prolongement(id_statut)
 );
-
-
