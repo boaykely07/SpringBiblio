@@ -21,6 +21,7 @@ import com.example.spring_practice.repository.LivreRepository;
 import com.example.spring_practice.model.entities.UtilisateurEntity;
 import com.example.spring_practice.model.entities.MvtProlongementEntity;
 import jakarta.servlet.http.HttpSession;
+import com.example.spring_practice.repository.JourFerieRepository;
 
 
 import java.util.*;
@@ -44,6 +45,8 @@ public class EmpruntController {
     private MvtProlongementRepository mvtProlongementRepository;
     @Autowired
     private com.example.spring_practice.repository.LivreRepository livreRepository;
+    @Autowired
+    private com.example.spring_practice.repository.JourFerieRepository jourFerieRepository;
 
     @GetMapping
     public String listEmprunts(Model model) {
@@ -100,10 +103,43 @@ public class EmpruntController {
             }
             List<ExemplaireEntity> exemplaires = exemplaireRepository.findAll();
             java.time.LocalDateTime dateDebut = emprunt.getDateEmprunt();
-            java.time.LocalDateTime dateFin = emprunt.getDateRetourPrevue();
+            // Calcul automatique de la date de fin
+            AdherentEntity adherent = adherentRepository.findById(emprunt.getAdherent().getId()).orElse(null);
+            if (adherent == null) {
+                model.addAttribute("error", "Adhérent introuvable.");
+                model.addAttribute("livres", livreRepository.findAll());
+                model.addAttribute("adherents", adherentRepository.findAll());
+                model.addAttribute("typesEmprunt", typeEmpruntRepository.findAll());
+                return "pages/admin/emprunts_form";
+            }
+            ProfilAdherentEntity profil = adherent.getProfil();
+            TypeEmpruntEntity typeEmprunt = emprunt.getTypeEmprunt();
+            if (typeEmprunt == null) {
+                model.addAttribute("error", "Type d'emprunt manquant.");
+                model.addAttribute("livres", livreRepository.findAll());
+                model.addAttribute("adherents", adherentRepository.findAll());
+                model.addAttribute("typesEmprunt", typeEmpruntRepository.findAll());
+                return "pages/admin/emprunts_form";
+            }
+            String nomType = typeEmprunt.getNomType();
+            java.time.LocalDateTime dateFin;
+            if ("Sur place".equalsIgnoreCase(nomType)) {
+                // Sur place : début à 06:00, fin à 18:00 le même jour
+                java.time.LocalDate jour = dateDebut.toLocalDate();
+                dateDebut = java.time.LocalDateTime.of(jour, java.time.LocalTime.of(6, 0));
+                dateFin = java.time.LocalDateTime.of(jour, java.time.LocalTime.of(18, 0));
+                emprunt.setDateEmprunt(dateDebut);
+            } else {
+                // A domicile (ou autre) : date de fin = date début + jourPret
+                int joursPret = profil.getJourPret();
+                dateFin = dateDebut.plusDays(joursPret);
+            }
+            emprunt.setDateRetourPrevue(dateFin);
+            final java.time.LocalDateTime finalDateDebut = dateDebut;
+            final java.time.LocalDateTime finalDateFin = dateFin;
             ExemplaireEntity exemplaireDispo = exemplaires.stream()
                 .filter(ex -> ex.getLivre().getId().equals(livreId))
-                .filter(ex -> empruntService.isExemplaireDisponiblePourPeriode(ex.getId(), dateDebut, dateFin))
+                .filter(ex -> empruntService.isExemplaireDisponiblePourPeriode(ex.getId(), finalDateDebut, finalDateFin))
                 .findFirst().orElse(null);
             if (exemplaireDispo == null) {
                 model.addAttribute("error", "Aucun exemplaire disponible pour ce livre à la date demandée.");
@@ -165,7 +201,12 @@ public class EmpruntController {
                 datePrevue = prolongement.getDateFin();
             }
         }
-        if (dateRetour.isAfter(datePrevue)) {
+        // Nouvelle logique : si la date prévue est un jour férié ou un week-end, on décale au prochain jour ouvré non férié
+        java.time.LocalDate dateLimite = datePrevue.toLocalDate();
+        while (jourFerieRepository.existsByDateFerie(dateLimite) || dateLimite.getDayOfWeek().getValue() >= 6) {
+            dateLimite = dateLimite.plusDays(1);
+        }
+        if (dateRetour.toLocalDate().isAfter(dateLimite)) {
             PenaliteEntity penalite = new PenaliteEntity();
             penalite.setEmprunt(emprunt);
             penalite.setAdherent(emprunt.getAdherent());

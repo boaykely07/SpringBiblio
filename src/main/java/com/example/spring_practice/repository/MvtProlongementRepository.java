@@ -4,5 +4,5 @@ import com.example.spring_practice.model.entities.MvtProlongementEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MvtProlongementRepository extends JpaRepository<MvtProlongementEntity, Long> {
-    // Méthodes personnalisées si besoin
+    java.util.Optional<MvtProlongementEntity> findTopByProlongementIdOrderByDateMouvementDesc(Long prolongementId);
 } 

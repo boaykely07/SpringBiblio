@@ -4,4 +4,5 @@ import com.example.spring_practice.model.entities.JourFerieEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface JourFerieRepository extends JpaRepository<JourFerieEntity, java.time.LocalDate> {
+    boolean existsByDateFerie(java.time.LocalDate dateFerie);
 } 

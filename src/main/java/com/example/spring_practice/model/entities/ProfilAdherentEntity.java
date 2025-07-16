@@ -19,6 +19,15 @@ public class ProfilAdherentEntity {
     @Column(name = "quota_penalites_jours", nullable = false)
     private int quotaPenalitesJours = 7;
 
+    @Column(name = "jour_pret", nullable = false)
+    private int jourPret = 21;
+
+    @Column(name = "reservation_pret", nullable = false)
+    private int reservationPret = 2;
+
+    @Column(name = "prolongement_pret", nullable = false)
+    private int prolongementPret = 1;
+
     // Getters et setters
     public Long getId() {
         return id;
@@ -49,5 +58,24 @@ public class ProfilAdherentEntity {
     }
     public void setQuotaPenalitesJours(int quotaPenalitesJours) {
         this.quotaPenalitesJours = quotaPenalitesJours;
+    }
+
+    public int getJourPret() {
+        return jourPret;
+    }
+    public void setJourPret(int jourPret) {
+        this.jourPret = jourPret;
+    }
+    public int getReservationPret() {
+        return reservationPret;
+    }
+    public void setReservationPret(int reservationPret) {
+        this.reservationPret = reservationPret;
+    }
+    public int getProlongementPret() {
+        return prolongementPret;
+    }
+    public void setProlongementPret(int prolongementPret) {
+        this.prolongementPret = prolongementPret;
     }
 }

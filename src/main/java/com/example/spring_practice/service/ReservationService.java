@@ -101,6 +101,18 @@ public class ReservationService {
         if (disponible <= 0) {
             throw new IllegalStateException("Aucun exemplaire disponible pour ce livre à la date demandée.");
         }
+        // Vérification du quota de réservations en attente pour le profil adhérent
+        int quotaReservation = reservation.getAdherent().getProfil().getReservationPret();
+        List<ReservationEntity> reservationsAdh = reservationRepository.findByAdherentId(adherentId);
+        long nbEnAttente = reservationsAdh.stream().filter(r -> {
+            // On regarde le dernier statut de chaque réservation
+            return mvtReservationRepository.findTopByReservationIdOrderByDateMouvementDesc(r.getId())
+                .map(mvt -> "En attente".equalsIgnoreCase(mvt.getStatutNouveau().getCodeStatut()))
+                .orElse(false);
+        }).count();
+        if (nbEnAttente >= quotaReservation) {
+            throw new IllegalStateException("Quota de réservations en attente atteint pour ce profil adhérent.");
+        }
         // Sauvegarde de la réservation
         ReservationEntity savedReservation = reservationRepository.save(reservation);
         

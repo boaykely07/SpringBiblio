@@ -6,6 +6,7 @@ import com.example.spring_practice.repository.AbonnementRepository;
 import com.example.spring_practice.model.entities.AbonnementEntity;
 import com.example.spring_practice.repository.PenaliteRepository;
 import com.example.spring_practice.model.entities.PenaliteEntity;
+import com.example.spring_practice.repository.MvtProlongementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class ProlongementService {
     @Autowired
     private PenaliteRepository penaliteRepository;
 
+    @Autowired
+    private com.example.spring_practice.repository.MvtProlongementRepository mvtProlongementRepository;
+
     public List<ProlongementEntity> findAll() {
         return prolongementRepository.findAll();
     }
@@ -32,6 +36,20 @@ public class ProlongementService {
     }
 
     public ProlongementEntity save(ProlongementEntity prolongement) {
+        // Vérification du quota de prolongements en attente pour le profil adhérent
+        if (prolongement.getEmprunt() != null && prolongement.getEmprunt().getAdherent() != null) {
+            Long adherentId = prolongement.getEmprunt().getAdherent().getId();
+            int quotaProlongement = prolongement.getEmprunt().getAdherent().getProfil().getProlongementPret();
+            java.util.List<ProlongementEntity> prolongementsAdh = prolongementRepository.findByEmprunt_Adherent_Id(adherentId);
+            long nbEnAttente = prolongementsAdh.stream().filter(p -> {
+                return mvtProlongementRepository.findTopByProlongementIdOrderByDateMouvementDesc(p.getId())
+                    .map(mvt -> "En attente".equalsIgnoreCase(mvt.getStatutNouveau().getCodeStatut()))
+                    .orElse(false);
+            }).count();
+            if (nbEnAttente >= quotaProlongement) {
+                throw new IllegalStateException("Quota de prolongements en attente atteint pour ce profil adhérent.");
+            }
+        }
         // Vérification de l'abonnement actif à la nouvelle date de fin
         if (prolongement.getEmprunt() != null && prolongement.getEmprunt().getAdherent() != null && prolongement.getDateFin() != null) {
             Long adherentId = prolongement.getEmprunt().getAdherent().getId();
